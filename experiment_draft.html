@@ -1,0 +1,758 @@
+Load jsPsych--> 
+<!DOCTYPE html> 
+<html> 
+ 
+<head> 
+<!--create title shown in tab; not the same as header on webpage--> 
+<title>Neuroaesthetics_Cinema_Study</title> 
+<!--load the jsPsych library; set src to own path--> 
+<script src="jspsych/jspsych.js"></script> 
+ 
+<!--Load all necessary plugins--> 
+<script src="jspsych/plugins/plugin-html-keyboard-response.js"></script> 
+<script src="jspsych/plugins/plugin-html-button-response.js"></script> 
+<script src="jspsych/plugins/plugin-fullscreen.js"></script> 
+<script src="jspsych/plugins/plugin-survey-text.js"></script> 
+<script src="jspsych/plugins/plugin-preload.js"></script> 
+<script src="jspsych/plugins/plugin-image-keyboard-response.js"></script> 
+<script src="jspsych/plugins/plugin-video-keyboard-response.js"></script> 
+<script src="jspsych/plugins/plugin-survey-multi-choice.js"></script> 
+<script src="jspsych/plugins/plugin-browser-check.js"></script> 
+<script src="jspsych/plugins/plugin-survey-likert.js"></script> 
+<script src="jspsych/plugins/plugin-video-button-response.js"></script> 
+<script src="jspsych/plugins/plugin-image-button-response.js"></script> 
+<script src="jspsych/plugins/plugin-external-html.js"></script> 
+<!--Load Stimuli and custom plugins--> 
+<script src="https://realitybending.github.io/JSmisc/misc/utils.js"></script> 
+<script src="jspsych/plugins/plugin-survey-multi-choice.js"></script> 
+ 
+<!-- Default CSS --> 
+<link href="jspsych/jspsych.css" rel="stylesheet" type="text/css" /> 
+<!--<script type="text/javascript" src="lib/vendors/jquery-2.2.0.min.js"></script>--> 
+<style> 
+#jspsych-image-keyboard-response-stimulus { 
+/*adjust image stimuli params to fit screen*/ 
+height: auto; 
+width: 55%; 
+} 
+ 
+body { 
+/*Hide scrollbar while keeping it functional */ 
+overflow-y: scroll; 
+overflow-x: flow; 
+} 
+ 
+Body::-webkit-scrollbar { 
+display: none; 
+} 
+ 
+/* set canvas to be full screen */ 
+.jspsych-content { 
+max-width: 100%; 
+} 
+</style> 
+</head> 
+ 
+<body></body> 
+ 
+<script> 
+ 
+ 
+/* Initialize jsPsych ================================================================*/ 
+var jsPsych = initJsPsych({ 
+show_progress_bar: true, 
+message_progress_bar: "Completion", 
+on_finish: function () { 
+jsPsych.data.displayData("json") 
+jsPsych.data 
+.get() 
+.localSave( 
+"json", 
+`${jsPsych.data.get().values()[0]["participant_id"] 
+}_FF.json` 
+) 
+// window.location = "https://app.prolific.co/submissions/complete?cc=XXXXX" /* redirect to prolific when experiment is finished */ 
+}, 
+}); 
+ 
+var timeline = []; 
+ 
+/* Initialize Experiment =============================================================*/ 
+// Fullscreen Mode 
+timeline.push({ 
+type: jsPsychFullscreen, 
+fullscreen_mode: true, 
+}) 
+ 
+// Preload Stimuli  
+timeline.push({ 
+type: jsPsychHtmlKeyboardResponse, 
+stimulus: "<p>Please wait for the experiment to load...</p>", 
+choices: "NO_KEYS", 
+trial_duration: 1000, 
+data: { screen: "stimuli_loading" }, 
+}) 
+// Retrieve and save browser info 
+var browser_check = { 
+type: jsPsychBrowserCheck, 
+data: { 
+screen: "browser_info", 
+version: "1.0", 
+date: new Date().toLocaleDateString("fr-FR"), 
+time: new Date().toLocaleTimeString("fr-FR"), 
+}, 
+on_finish: function () { 
+data = jsPsych.data 
+.get() 
+.filter({ screen: "browser_info" }) 
+.values()[0] 
+jsPsych.data.addProperties({ 
+["screen_height"]: data["height"], 
+["screen_width"]: data["width"], 
+}) 
+for (var key in data) { 
+if ( 
+[ 
+"vsync_rate", 
+"os", 
+"mobile", 
+"browser", 
+"browser_version", 
+].includes(key) 
+) { 
+jsPsych.data.addProperties({ 
+[key]: data[key], 
+}) 
+} 
+} 
+jsPsych.data.addProperties() 
+}, 
+} 
+ 
+timeline.push(browser_check) 
+// Participant information 
+var prolific_id = jsPsych.data.getURLVariable("PROLIFIC_PID"); 
+var jspsych_id = jsPsych.randomization.randomID(5) 
+var participant_id = `${prolific_id}_${jspsych_id}` 
+var study_id = jsPsych.data.getURLVariable("STUDY_ID") 
+var session_id = jsPsych.data.getURLVariable("SESSION_ID") 
+ 
+// Consent Screen 
+var consent ={ 
+type: jsPsychHtmlButtonResponse, 
+stimulus: 
+"<div style='font-size:10px';><h1></br></br>Study on Neuroaesthetics</h1></div>" + 
+"<div class='margin-left-10'>"+ 
+"<p>In this study, you will first be asked to answer questions about yourself, and then rate clips according to certain characteristics.</p>" + 
+"<p>Your participation in this study is completely voluntary. If you do not wish to complete this survey, simply close your browser.</p>" + 
+"<p>Your participation in this research will be kept completely confidential. Your responses are anonymous and IP addresses will not be collected to guarantee complete anonymity.</p>", 
+choices: ["I consent"], 
+data: { screen: "consent" } 
+} 
+timeline.push(consent) 
+ 
+// Pre Questionaires 
+// Demographics 
+var instructions1 = { 
+type: jsPsychHtmlButtonResponse, 
+stimulus: 
+"<h1>Part 1/4</h1>" + 
+"<p>Welcome to the study! Before starting the first task, it is important for us to understand our participants' characteristics, so that our conclusions are scientifically valid.</p>" + 
+"<p>Let's start with some questions about yourself.</p>", 
+choices: ["Continue"], 
+data: { screen: "instructions1" }, 
+} 
+timeline.push(instructions1) 
+var participant_info = { 
+type: jsPsychSurveyText, 
+questions: [ 
+{ 
+prompt: "Please enter your age (in years, e.g., '31')", 
+name: "age", 
+required: true, 
+}, 
+{ 
+prompt: "Please enter your country of birth (e.g., 'France')", 
+name: "nationality", 
+required: true, 
+}, 
+{ 
+prompt: "Please enter your ethnicity (e.g., 'Caucasian')", 
+name: "ethnicity", 
+required: true, 
+}, 
+], 
+on_finish: function () { 
+jsPsych.data.addProperties({ 
+participant_id: participant_id, 
+study_id: study_id, 
+session_id: session_id, 
+}) 
+}, 
+data: { 
+screen: "demographics", 
+}, 
+} 
+var demographics = { 
+type: jsPsychSurveyMultiChoice, 
+questions: [ 
+{ 
+prompt: "What is your sex?", 
+options: ["Male", "Female", "Other", "Prefer not to say"], 
+name: "sex", 
+required: true, 
+}, 
+{ 
+prompt: "What is your highest completed education level?", 
+options: [ 
+"University (doctorate)", 
+"University (master)", 
+"University (bachelor)", 
+"High school", 
+"Other", 
+"Prefer not to say", 
+], 
+name: "education", 
+required: true, 
+}, 
+], 
+data: { 
+screen: "demographics", 
+}, 
+} 
+timeline.push( 
+participant_info, 
+demographics) 
+ 
+ 
+// Pre screening  
+var instructions2 = { 
+type: jsPsychHtmlButtonResponse, 
+stimulus: 
+"<h1>Part 2/4</h1>" + 
+"<p>In this section, we will ask you some further questions relating to the tasks.</p>", 
+choices: ["Continue"], 
+data: { screen: "instructions2" } 
+}; 
+timeline.push(instructions2) 
+ 
+// AI Use 
+var ai_use = { 
+type: jsPsychSurveyMultiChoice, 
+questions: [ 
+{ 
+prompt: "Have you ever used AI tools (e.g., ChatGPT, DALL·E)?", 
+options: ["Yes", "No"], 
+name: 'ai_use', 
+required: true 
+},  
+{ 
+prompt: "If yes, how often do you use AI tools?", 
+options: [ 
+"Never", "Rarely", "Sometimes", "Often", "Daily"], 
+name: 'ai_frequency', 
+required: true 
+}, 
+], 
+data: { 
+screen: "Pre-screening" 
+} 
+} 
+timeline.push(ai_use) 
+ 
+// AI Attitudes 
+var ai_attitudes = { 
+type: jsPsychSurveyLikert, 
+questions: [ 
+{ 
+prompt: "How much do you trust AI-generated content (e.g., writing, images, video)?", 
+labels: ["Not at all", "A little", "Somewhat", "Mostly", "Completely"], 
+required: true, 
+name: 'ai_trust' 
+}, 
+{ 
+prompt: "To what extent do you believe AI can play a positive role in society?", 
+labels: ["Not at all", "A little", "Somewhat", "Quite a bit", "Very much"], 
+required: true, 
+name: 'ai_positive_role' 
+}, 
+], 
+data: { 
+screen: "Pre-screening" 
+} 
+} 
+timeline.push(ai_attitudes); 
+ 
+// Film Frequency 
+var film_frequency = { 
+type: jsPsychSurveyLikert, 
+questions: [ 
+{ 
+prompt: "How often do you watch or consume films?", 
+labels: [ 
+"Never",  
+"Rarely",  
+"Sometimes",  
+"Often",  
+"Daily", 
+], 
+}, 
+], 
+data: { 
+screen: "Pre-screening", 
+}, 
+} 
+timeline.push(film_frequency) 
+ 
+// Media Literacy 
+var likert_scale = [ 
+"Not at all", 
+"A Little", 
+"Somewhat", 
+"Very", 
+"Extremely" 
+]; 
+ 
+var media_literacy = { 
+type: jsPsychSurveyLikert, 
+questions: [ 
+{prompt: "How much do you enjoy watching films?", name: 'film_enjoyment', labels: likert_scale}, 
+{prompt: "How confident are you in evaluating the quality of a film?", name: 'film_quality', labels: likert_scale}, 
+{prompt: "How confident are you in identifying film messages or themes?", name: 'film_identification', labels: likert_scale}, 
+{prompt: "How confident are you in recognizing the emotions a film tries to convey?", name: 'film_empathy', labels: likert_scale}, 
+], 
+data: { 
+screen: "Pre-screening" 
+}, 
+randomize_question_order: true 
+}; 
+ 
+timeline.push(media_literacy); 
+ 
+// Media professional? 
+var media_professional = { 
+type: jsPsychSurveyMultiChoice, 
+questions: [ 
+{ 
+prompt: "Do you work in the media industry (e.g., film, TV, journalism, production)?", 
+options: ["Yes", "No"], 
+required: true, 
+name: 'media_professional' 
+}, 
+], 
+data: { 
+screen: "Pre-screening" 
+} 
+}; 
+ 
+var media_professional_details = { 
+type:jsPsychSurveyMultiChoice, 
+questions: [ 
+{ 
+prompt: "What area of the media do you work in?", 
+options:[ 
+"Editorial",  
+"Production",  
+"Post-Production",  
+"Development",  
+"Commissioning",  
+"Other" 
+], 
+name: 'media_area', 
+required: true 
+},  
+{ 
+prompt: "What is your seniority level?", 
+options: [ 
+"Entry",  
+"Junior",  
+"Mid-level",  
+"Senior" 
+], 
+name: 'seniority', 
+required: true 
+},  
+], 
+data: { 
+screen: "Pre-screening" 
+} 
+}; 
+ 
+timeline.push(media_professional); 
+ 
+timeline.push({ 
+timeline: [media_professional_details], 
+conditional_function: function () { 
+var last_response = jsPsych.data.get().filter({}).values().pop(); 
+if (last_response && last_response.response && last_response.response['media_professional'] === "Yes") { 
+return true; 
+} else { 
+return false; 
+} 
+} 
+}); 
+ 
+// Experiment Instructions
+var Experiment_Instructions = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus:
+            "<h1>Part 3/4</h1>" +
+            "<div style='text-align: left'>" +
+            "<p>In this part of the experiment, short clips will be shown on the screen.</p>" +
+            "<p>After each clip, you will be asked a series of questions, such as:</p><ul>" +
+            "<li><p>How emotional did you find the clip?</p></li>" +
+            "<li><p>How familiar does this clip feel to you?</p></li>" +
+            "<li><p>How visually pleasing or beautiful was the clip? </p></li>" +
+        "<p>We are interested in your first impressions. Please respond according to your gut feelings.</p>",
+            choices: ["Start"],
+        data: { screen: "Experiment_Instructions" },
+    }
+
+timeline.push(Experiment_Instructions);
+
+// Experiment Part 1
+var video_stimuli = [
+  { stimulus: ['media/stimuli5.mp4'] },
+  { stimulus: ['media/stimuli13.mp4'] },
+  { stimulus: ['media/stimuli16.mp4'] },
+  { stimulus: ['media/stimuli18.mp4'] },
+];
+
+var video_files = video_stimuli.map(item => item.stimulus).flat();
+
+var preload = {
+  type: jsPsychPreload,
+  video: video_files
+};
+
+timeline.push(preload);
+
+var video_trial = {
+  type: jsPsychVideoKeyboardResponse,
+  stimulus: jsPsych.timelineVariable('stimulus'),
+  trial_duration: 4000,
+  response_allowed_while_playing: false,
+  choices: "NO_KEYS",
+  width: 1000,
+  post_trial_gap: 500
+};
+
+// Post Viewing Questions 1 
+var likert_scale = [  
+"Not at all",  
+"A Little",  
+"Somewhat",  
+"Very",  
+"Extremely"  
+];  
+var post_viewing_1 = {  
+type: jsPsychSurveyLikert,  
+questions: [  
+{prompt: "How emotional did you find the clip?", name: 'emotional_rating', labels: likert_scale},  
+{prompt: "How familiar did you find the clip?", name: 'familiarity_rating', labels: likert_scale},  
+{prompt: "How visually pleasing or beautiful did you find the clip?", name: 'aesthetic_rating', labels: likert_scale}, 
+],  
+data: {  
+screen: "post_viewing_1"  
+},  
+randomize_question_order: true  
+};  
+ 
+var experiment_part_1 = {
+  timeline: [video_trial, post_viewing_1],
+  timeline_variables: video_stimuli,
+  randomize_order: false
+};
+
+timeline.push(experiment_part_1);
+
+
+// Experiment Task 2
+
+// Experiment Instructions 2
+var Experiment_Instructions_2 = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus:
+            "<h1>Part 3/4</h1>" +
+            "<div style='text-align: left'>" +
+            "<p>In this part of the experiment, short clips will be shown on the screen again, with different labels.</p>" +
+            "<p>After each clip, you will be asked the same questions as your first viewing</p><ul>" +
+            "<p>Please respond according to your gut feelings.</p>",
+            choices: ["Start"],
+        data: { screen: "Experiment_Instructions_2" },
+    }
+
+timeline.push(Experiment_Instructions_2);
+
+var video_stimuli = [
+  { stimulus: ['media/stimuli5.mp4'] },
+  { stimulus: ['media/stimuli13.mp4'] },
+  { stimulus: ['media/stimuli16.mp4'] },
+  { stimulus: ['media/stimuli18.mp4'] },
+];
+
+var labels = ["Human Generated", "AI Generated"];
+
+video_stimuli.forEach(function(item) {
+  var randomLabel = labels[Math.floor(Math.random() * labels.length)];
+  item.label = randomLabel;
+});
+
+var video_files = video_stimuli.map(item => item.stimulus).flat();
+
+var preload = {
+  type: jsPsychPreload,
+  video: video_files
+};
+
+timeline.push(preload);
+
+var video_trial = {
+  type: jsPsychVideoKeyboardResponse,
+  stimulus: jsPsych.timelineVariable('stimulus'),
+  trial_duration: 4000,
+  response_allowed_while_playing: false,
+  choices: "NO_KEYS",
+  width: 1000,
+  prompt: jsPsych.timelineVariable('label'),  // show label below video
+  post_trial_gap: 500
+};
+
+// Post Viewing Questions 2
+var likert_scale = [  
+"Not at all",  
+"A Little",  
+"Somewhat",  
+"Very",  
+"Extremely"  
+];  
+var post_viewing_2 = {  
+type: jsPsychSurveyLikert,  
+questions: [  
+{prompt: "How emotional did you find the clip?", name: 'emotional_rating', labels: likert_scale},  
+{prompt: "How familiar did you find the clip?", name: 'familiarity_rating', labels: likert_scale},  
+{prompt: "How visually pleasing or beautiful did you find the clip?", name: 'aesthetic_rating', labels: likert_scale}, 
+{prompt: "To what extent did you believe the label provided?", name: 'belief_in_label', labels: likert_scale}, 
+
+],  
+data: {  
+screen: "post_viewing_2"  
+},  
+randomize_question_order: true  
+};  
+ 
+var test_procedure = {
+  timeline: [video_trial, post_viewing_1],
+  timeline_variables: video_stimuli,
+  randomize_order: false 
+};
+
+timeline.push(test_procedure);
+// Debrief 
+var Debrief ={ 
+type: jsPsychHtmlButtonResponse, 
+stimulus: 
+"<h1>Part 4/4</h1>" + 
+"<div style='font-size:10px';><h1></br></br>Study on Neuroaesthetics</h1></div>" + 
+"<div class='margin-left-10'>"+ 
+"<p>Thank you for participating in this study.</p>" + 
+"<p>The video labels (e.g., AI-generated or Human-made) were randomly assigned in order to assess how disclosure influences viewers’ perceptions and emotional responses.</p>" + 
+"<p>This study is designed to explore how people engage with visual media depending on what they are told about its origin.</p>" + 
+"<p>All of the clips were in fact created by professional filmmakers, and no AI was used</p>" + 
+"<p> Without this deception, it would not be possible to isolate the psychological effects of disclosure from the actual qualities of AI-generated material.</p>" + 
+"<p>Your participation in this research will be kept completely confidential. Your responses are anonymous and IP addresses will not be collected to guarantee complete anonymity.</p>" + 
+"<p>You will now be asked some brief questions about your experience in the study</p>", 
+choices: ["Continue"], 
+data: { screen: "Debrief" } 
+} 
+ 
+timeline.push(Debrief); 
+ 
+// Overall Experience 
+var Engagement = { 
+type: jsPsychSurveyLikert, 
+questions: [ 
+{ 
+prompt: "How engaging did you find the tasks overall?", 
+labels: [ 
+"Not at all",  
+"A Little",  
+"Moderately",  
+"Very",  
+"Extremely", 
+], 
+}, 
+], 
+data: { 
+screen: "Engagement", 
+}, 
+} 
+timeline.push(Engagement); 
+ 
+// Suspected Deception 
+var suspected_deception = { 
+type: jsPsychSurveyMultiChoice,  
+questions: [  
+{  
+prompt: "Did you suspect that the AI generated labels might have been false?",  
+options: ["Yes", "No"],  
+required: true,  
+name: 'suspected_deception' 
+}, 
+], 
+data: { 
+screen: "suspected_deception" 
+} 
+}; 
+ 
+var suspected_deception_why = { 
+type: jsPsychSurveyText, 
+questions: [ 
+{ 
+prompt: "What gave it away?", 
+rows: 7,  
+columns: 40,  
+name: "suspected_deception_why", 
+required: true, 
+}, 
+],  
+data: { 
+screen: "suspected_deception" 
+} 
+}; 
+ 
+timeline.push(suspected_deception); 
+timeline.push({ 
+timeline: [suspected_deception_why], 
+conditional_function: function () { 
+var last_response = jsPsych.data.get().filter({}).values().pop(); 
+if (last_response && last_response.response && last_response.response['suspected_deception'] === "Yes") { 
+return true; 
+console.log(last_response) 
+} else { 
+return false; 
+console.log(last_response) 
+} 
+} 
+}); 
+ 
+//Changing Perceptions of AI 
+var changing_perceptions_ai = { 
+type: jsPsychSurveyMultiChoice, 
+questions: [ 
+{ 
+prompt: "Did participating in this study change how you feel about AI-generated content?", 
+options: ["Yes", "No"], 
+required: true, 
+name: 'changing_perceptions_ai' 
+}, 
+], 
+data: { 
+screen: "changing_perceptions_ai" 
+} 
+}; 
+ 
+var changing_perceptions_ai_details = { 
+type: jsPsychSurveyText, 
+questions: [ 
+{ 
+prompt: "How did your feelings around AI generated content change ?", 
+rows: 7,  
+columns: 40,  
+name: "changing_perceptions_ai_details", 
+required: true, 
+},  
+], 
+data: { 
+screen: "changing_perceptions_ai" 
+} 
+}; 
+ 
+timeline.push(changing_perceptions_ai) 
+ 
+timeline.push({ 
+timeline: [changing_perceptions_ai_details], 
+conditional_function: function () { 
+var last_response = jsPsych.data.get().filter({}).values().pop(); 
+if (last_response && last_response.response && last_response.response['changing_perceptions_ai'] === "Yes") { 
+return true; 
+console.log(last_response) 
+} else { 
+return false; 
+console.log(last_response) 
+} 
+} 
+}); 
+ 
+//Emotional Impact of Disclosure 
+var emotional_impact_disclosure = { 
+type: jsPsychSurveyMultiChoice, 
+questions: [ 
+{ 
+prompt: "Did seeing AI/human labels affect you emotionally in any way?", 
+options: ["Yes", "No"], 
+required: true, 
+name: 'emotional_impact_disclosure' 
+}, 
+], 
+data: { 
+screen: "emotional_impact_disclosure" 
+} 
+}; 
+ 
+var emotional_impact_disclosure_details = { 
+type: jsPsychSurveyText, 
+questions: [ 
+{ 
+prompt: "How did the disclosure of AI / Human lavels affect you?", 
+rows: 7,  
+columns: 40,  
+name: "emotional_impact_disclosure_details", 
+required: true, 
+},  
+], 
+data: { 
+screen: "emotional_impact_disclosure" 
+} 
+}; 
+ 
+timeline.push(emotional_impact_disclosure) 
+ 
+timeline.push({ 
+timeline: [emotional_impact_disclosure_details], 
+conditional_function: function () { 
+var last_response = jsPsych.data.get().filter({}).values().pop(); 
+if (last_response && last_response.response && last_response.response['emotional_impact_disclosure'] === "Yes") { 
+return true; 
+console.log(last_response) 
+} else { 
+return false; 
+console.log(last_response) 
+} 
+} 
+}); 
+ 
+var experience_details = { 
+type: jsPsychSurveyText, 
+questions: [ 
+{ 
+prompt: "Is there anything else you would like to share about your experience in this study?", 
+rows: 7,  
+columns: 40,  
+name: "experience_details", 
+required: true, 
+}, 
+],  
+data: { 
+screen: "experience_details" 
+} 
+}; 
+ 
+timeline.push(experience_details); 
+ 
+jsPsych.run(timeline); 
+</script> 
+</html> 
+jsPsych.run(timeline);
+</script>
+</html>
