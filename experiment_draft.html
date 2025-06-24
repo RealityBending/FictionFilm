@@ -140,7 +140,7 @@ var session_id = jsPsych.data.getURLVariable("SESSION_ID")
 var consent ={
         type: jsPsychHtmlButtonResponse,
         stimulus:
-            "<div style='font-size:10px';><h1></br></br>Study on Face Perception</h1></div>" +
+            "<div style='font-size:10px';><h1></br></br>Welcome to the study!</h1></div>" +
             "<div class='margin-left-10'>"+
             "<p>In this study, you will first be asked to answer questions about yourself, and then rate clips according to certain characteristics.</p>" +
             "<p>Your participation in this study is completely voluntary. If you do not wish to complete the study, simply close your browser.</p>" +
@@ -405,16 +405,13 @@ stimulus:
 "<p>By Artificial Intelligence we mean devices that can perform tasks that would usually require human intelligence.</p>" +
 "<p>Please note that these can be computers, robots or other hardware devices, possibly augmented with sensors or cameras, etc.</p>" +
 "<p>Please complete the following scale, indicating your response to each item.</p>" +
-"<p>Please complete the following scale, indicating your response to each item.</p>" +
- "<p>here are no right or wrong answers. We are interested in your personal views.</p>", 
+ "<p>There are no right or wrong answers. We are interested in your personal views.</p>", 
 choices: ["Continue"], 
 data: { screen: "instructions2" } 
 }; 
 timeline.push(instructions2) 
  
-// AI Use 
-
-// Post Viewing Questions 1 
+// AI Attitudes
 var likert_scale = [  
 "Strongly disagree",  
 "Disagree",  
@@ -440,7 +437,7 @@ questions: [
 {prompt: "An artificially intellgient agent would be better than an employee in many routine jobs.", name: 'P13', labels: likert_scale},  
 {prompt: "There are many beneficial applications of Artificial Intelligence.", name: 'P14', labels: likert_scale},  
 {prompt: "I shiver with discomfort when I think about the future uses of Artificial Intelligence.", name: 'N15', labels: likert_scale},  
-{prompt: "Artificially intelligent sustems can perform better than humans.", name: 'P16', labels: likert_scale},  
+{prompt: "Artificially intelligent systems can perform better than humans.", name: 'P16', labels: likert_scale},  
 {prompt: "Much of society will benefit from a future full of Artificial Intelligence.", name: 'P17', labels: likert_scale},  
 {prompt: "I would like to use Artificial Intelligence in my own job.", name: 'P18', labels: likert_scale},  
 {prompt: "People like me will suffer if Artifiical Intelligence is used more and more.", name: 'N19', labels: likert_scale},  
@@ -526,12 +523,76 @@ randomize_question_order: true
 };  
  
 var test_procedure = {
-  timeline: [video_trial, post_viewing_1],
+  timeline: [video_trial, post_viewing_2],
   timeline_variables: video_stimuli,
   randomize_order: false 
 };
 
-timeline.push(test_procedure);
+// Experiment Part 3
+
+// Experiment Instructions 3
+var Experiment_Instructions_3 = {
+        type: jsPsychHtmlButtonResponse,
+        stimulus:
+            "<h1>Part 3/4</h1>" +
+            "<div style='text-align: left'>" +
+            "<p>In this part of the experiment, you will be shown each of the clips again.</p>" +
+            "<p>After each clip, you will be asked to identify or label the clips as either AI generated, or human made</p><ul>" +
+            "<p>Please respond according to your gut feelings.</p>",
+            choices: ["Start"],
+        data: { screen: "Experiment_Instructions_3" },
+    }
+
+timeline.push(Experiment_Instructions_3);
+
+var video_stimuli = [
+  { stimulus: ['media/stimuli16.mp4'] },
+  { stimulus: ['media/stimuli18.mp4'] },
+];
+
+var video_files = video_stimuli.map(item => item.stimulus).flat();
+
+var preload = {
+  type: jsPsychPreload,
+  video: video_files
+};
+
+timeline.push(preload);
+
+var video_trial = {
+  type: jsPsychVideoKeyboardResponse,
+  stimulus: jsPsych.timelineVariable('stimulus'),
+  trial_duration: 4000,
+  response_allowed_while_playing: false,
+  choices: "NO_KEYS",
+  width: 1000,
+  post_trial_gap: 500
+};
+
+// Post Viewing Questions 3
+var Participant_labelling_task = { 
+type: jsPsychSurveyMultiChoice, 
+questions: [ 
+{ 
+prompt: "Do you think this clip was AI generated or Human made?", 
+options: ["AI generated", "Human made"], 
+required: true, 
+name: 'participant_labelling_task' 
+}, 
+], 
+data: { 
+screen: "participant_labelling_task" 
+} 
+}; 
+ 
+var experiment_part_3 = {
+  timeline: [video_trial, Participant_labelling_task],
+  timeline_variables: video_stimuli,
+  randomize_order: false
+};
+
+timeline.push(Participant_labelling_task);
+
 // Debrief 
 var Debrief ={ 
 type: jsPsychHtmlButtonResponse, 
@@ -545,7 +606,7 @@ stimulus:
 "<p>All of the clips were in fact created by professional filmmakers, and no AI was used</p>" + 
 "<p> Without this deception, it would not be possible to isolate the psychological effects of disclosure from the actual qualities of AI-generated material.</p>" + 
 "<p>Your participation in this research will be kept completely confidential. Your responses are anonymous and IP addresses will not be collected to guarantee complete anonymity.</p>" + 
-"<p>You will now be asked some brief questions about your experience in the study</p>", 
+"<p>You will now be asked some brief questions about your experience in the study.</p>", 
 choices: ["Continue"], 
 data: { screen: "Debrief" } 
 } 
