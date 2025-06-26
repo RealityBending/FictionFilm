@@ -143,6 +143,7 @@ var consent ={
             "<div style='font-size:10px';><h1></br></br>Welcome to the study!</h1></div>" +
             "<div class='margin-left-10'>"+
             "<p>In this study, you will first be asked to answer questions about yourself, and then rate clips according to certain characteristics.</p>" +
+            "<p>There will be three tasks to complete in total and the experiment will take approximately ** minutes.</p>" +
             "<p>Your participation in this study is completely voluntary. If you do not wish to complete the study, simply close your browser.</p>" +
             "<p>Your participation in this research will be kept completely confidential. Your responses are anonymous and IP addresses will not be collected to guarantee complete anonymity.</p>" +
             "<p>If you have any questions about the project, you may contact the team via the chat option in Prolific.</p>" +
@@ -400,7 +401,7 @@ var instructions2 = {
 type: jsPsychHtmlButtonResponse, 
 stimulus: 
 "<h1>Part 2/4</h1>" + 
-"<p>In this section, we will ask you some further questions relating to the tasks.</p>" +
+"<p>In this section, we will ask you some further questions relating to the next two tasks.</p>" +
 "<p>We are interested in your attitudes towards Artificial Intelligence.</p>" +
 "<p>By Artificial Intelligence we mean devices that can perform tasks that would usually require human intelligence.</p>" +
 "<p>Please note that these can be computers, robots or other hardware devices, possibly augmented with sensors or cameras, etc.</p>" +
@@ -472,7 +473,6 @@ var video_stimuli = [
   { stimulus: ['media/stimuli16.mp4'] },
   { stimulus: ['media/stimuli18.mp4'] },
 ];
-
 var labels = ["Human Generated", "AI Generated"];
 
 video_stimuli.forEach(function(item) {
@@ -496,7 +496,7 @@ var video_trial = {
   response_allowed_while_playing: false,
   choices: "NO_KEYS",
   width: 1000,
-  prompt: jsPsych.timelineVariable('label'),  
+  prompt: jsPsych.timelineVariable('label'),  // show label below video
   post_trial_gap: 500
 };
 
@@ -514,7 +514,6 @@ questions: [
 {prompt: "How emotional did you find the clip?", name: 'emotional_rating', labels: likert_scale},  
 {prompt: "How visually pleasing or beautiful did you find the clip?", name: 'aesthetic_rating', labels: likert_scale}, 
 {prompt: "To what extent did you believe the label provided?", name: 'belief_in_label', labels: likert_scale}, 
-
 ],  
 data: {  
 screen: "post_viewing_2"  
@@ -523,10 +522,13 @@ randomize_question_order: true
 };  
  
 var test_procedure = {
-  timeline: [video_trial, post_viewing_2],
+  timeline: [video_trial, post_viewing_1],
   timeline_variables: video_stimuli,
   randomize_order: false 
 };
+
+timeline.push(test_procedure);
+
 
 // Experiment Part 3
 
@@ -579,19 +581,20 @@ options: ["AI generated", "Human made"],
 required: true, 
 name: 'participant_labelling_task' 
 }, 
-], 
-data: { 
-screen: "participant_labelling_task" 
-} 
-}; 
+],  
+data: {  
+screen: "post_viewing_2"  
+},  
+randomize_question_order: true  
+};  
  
-var experiment_part_3 = {
+var test_procedure = {
   timeline: [video_trial, Participant_labelling_task],
   timeline_variables: video_stimuli,
-  randomize_order: false
+  randomize_order: false 
 };
 
-timeline.push(Participant_labelling_task);
+timeline.push(test_procedure);
 
 // Debrief 
 var Debrief ={ 
