@@ -159,8 +159,8 @@ var consent ={
 var instructions1 = { 
 type: jsPsychHtmlButtonResponse, 
 stimulus: 
-"<h1>Part 1/4</h1>" + 
-"<p>Welcome to the study! Before starting the first task, it is important for us to understand our participants' characteristics, so that our conclusions are scientifically valid.</p>" + 
+"<h1>Welcome!</h1>" + 
+"<p>Before starting the first task, it is important for us to understand our participants' characteristics, so that our conclusions are scientifically valid.</p>" + 
 "<p>Let's start with some questions about yourself.</p>", 
 choices: ["Continue"], 
 data: { screen: "instructions1" }, 
@@ -232,7 +232,7 @@ demographics)
 var instructionsfilm = { 
 type: jsPsychHtmlButtonResponse, 
 stimulus: 
-"<h1>Part 1/4</h1>" + 
+"<h1>Pre Experiment Questions</h1>" + 
 "<p> Due to the nature of this study, we are interested in your overall consumption, knowledge and expertise on media (TV, Film etc.)</p>" + 
 "<p>Please read the statements carefully and indicate the extent to which you agree with each statement.</p>", 
 choices: ["Continue"], 
@@ -330,7 +330,7 @@ return false;
 var Experiment_Instructions = {
         type: jsPsychHtmlButtonResponse,
         stimulus:
-            "<h1>Part 3/4</h1>" +
+            "<h1>Task 1 Instructions</h1>" +
             "<div style='text-align: left'>" +
             "<p>In this part of the experiment, short clips will be shown on the screen.</p>" +
             "<p>After each clip, you will be asked a series of questions, such as:</p><ul>" +
@@ -400,7 +400,7 @@ timeline.push(experiment_part_1);
 var instructions2 = { 
 type: jsPsychHtmlButtonResponse, 
 stimulus: 
-"<h1>Part 2/4</h1>" + 
+"<h1>Pre Task Questions 2</h1>" + 
 "<p>In this section, we will ask you some further questions relating to the next two tasks.</p>" +
 "<p>We are interested in your attitudes towards Artificial Intelligence.</p>" +
 "<p>By Artificial Intelligence we mean devices that can perform tasks that would usually require human intelligence.</p>" +
@@ -458,7 +458,7 @@ timeline.push(ai_attitudes);
 var Experiment_Instructions_2 = {
         type: jsPsychHtmlButtonResponse,
         stimulus:
-            "<h1>Part 3/4</h1>" +
+            "<h1>Task 2</h1>" +
             "<div style='text-align: left'>" +
             "<p>In this part of the experiment, short clips will be shown on the screen again, with different labels.</p>" +
             "<p>After each clip, you will be asked the same questions as your first viewing</p><ul>" +
@@ -538,7 +538,7 @@ timeline.push(test_procedure);
 var Experiment_Instructions_3 = {
         type: jsPsychHtmlButtonResponse,
         stimulus:
-            "<h1>Part 3/4</h1>" +
+            "<h1>Task 3</h1>" +
             "<div style='text-align: left'>" +
             "<p>In this part of the experiment, you will be shown each of the clips again.</p>" +
             "<p>After each clip, you will be asked to identify or label the clips as either AI generated, or human made</p><ul>" +
@@ -606,7 +606,7 @@ timeline.push(test_procedure);
 var Debrief ={ 
 type: jsPsychHtmlButtonResponse, 
 stimulus: 
-"<h1>Part 4/4</h1>" + 
+"<h1>Thank you!</h1>" + 
 "<div style='font-size:10px';><h1></br></br>Study on Neuroaesthetics</h1></div>" + 
 "<div class='margin-left-10'>"+ 
 "<p>Thank you for participating in this study.</p>" + 
