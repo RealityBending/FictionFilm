@@ -368,7 +368,7 @@ var video_trial = {
   post_trial_gap: 500
 };
 
-// Post Viewing Questions 1 
+// Post Viewing Questions 1 // need to change to a slider 7 point not at all to very much 
 var likert_scale = [  
 "Not at all",  
 "A Little",  
@@ -379,13 +379,13 @@ var likert_scale = [
 var post_viewing_1 = {  
 type: jsPsychSurveyLikert,  
 questions: [  
-{prompt: "How emotional did you find the clip?", name: 'emotional_rating', labels: likert_scale},  
-{prompt: "How visually pleasing or beautiful did you find the clip?", name: 'aesthetic_rating', labels: likert_scale}, 
+{prompt: "To what extent do you agree that this visual representation is... enjoyable, likable, pleasing, nice, appealing?", name: 'aesthetic_rating', labels: likert_scale}, // separate scales for each word 7 point likert strongly disagree to strongly agree
+{prompt: "How much are you moved by this image?", name: 'emotional_rating', labels: likert_scale},  // 7 point slider not at all to very much
 ],  
 data: {  
 screen: "post_viewing_1"  
 },  
-randomize_question_order: true  
+randomize_question_order: false  
 };  
  
 var experiment_part_1 = {
@@ -460,7 +460,7 @@ var Experiment_Instructions_2 = {
         stimulus:
             "<h1>Task 2</h1>" +
             "<div style='text-align: left'>" +
-            "<p>In this part of the experiment, short clips will be shown on the screen again, with different labels.</p>" +
+            "<p>In this part of the experiment, short clips will be shown on the screen with different labels.</p>" +
             "<p>After each clip, you will be asked the same questions as your first viewing</p><ul>" +
             "<p>Please respond according to your gut feelings.</p>",
             choices: ["Start"],
@@ -475,7 +475,7 @@ var video_stimuli = [
   { stimulus: ['media/stimuli3.mp4'] },
   { stimulus: ['media/stimuli4.mp4'] },
 ];
-var labels = ["Human Generated", "AI Generated"];
+var labels = ["Human Made", "AI Generated"]; // Dom wants these before each clip and clearer
 
 video_stimuli.forEach(function(item) {
   var randomLabel = labels[Math.floor(Math.random() * labels.length)];
@@ -513,14 +513,14 @@ var likert_scale = [
 var post_viewing_2 = {  
 type: jsPsychSurveyLikert,  
 questions: [  
-{prompt: "How emotional did you find the clip?", name: 'emotional_rating', labels: likert_scale},  
-{prompt: "How visually pleasing or beautiful did you find the clip?", name: 'aesthetic_rating', labels: likert_scale}, 
+{prompt: "To what extent do you agree that this visual representation is... enjoyable, likable, pleasing, nice, appealing?", name: 'aesthetic_rating', labels: likert_scale}, // separate scales for each word 7 point likert strongly disagree to strongly agree
+{prompt: "How much are you moved by this image?", name: 'emotional_rating', labels: likert_scale},  // 7 point slider not at all to very much
 {prompt: "To what extent did you believe the label provided?", name: 'belief_in_label', labels: likert_scale}, 
 ],  
 data: {  
 screen: "post_viewing_2"  
 },  
-randomize_question_order: true  
+randomize_question_order: false 
 };  
  
 var test_procedure = {
@@ -541,7 +541,7 @@ var Experiment_Instructions_3 = {
             "<h1>Task 3</h1>" +
             "<div style='text-align: left'>" +
             "<p>In this part of the experiment, you will be shown each of the clips again.</p>" +
-            "<p>After each clip, you will be asked to identify or label the clips as either AI generated, or human made</p><ul>" +
+            "<p>After each clip, you will be asked to identify or label to the best of your ability, whether it was AI generated, or human made</p><ul>" +
             "<p>Please respond according to your gut feelings.</p>",
             choices: ["Start"],
         data: { screen: "Experiment_Instructions_3" },
@@ -582,7 +582,7 @@ var Participant_labelling_task = {
 type: jsPsychSurveyMultiChoice, 
 questions: [ 
 { 
-prompt: "Do you think this clip was AI generated or Human made?", 
+prompt: "Do you think this clip was AI generated or Human made?", // this feels awkwardly layed out and not clear enough, any suggestions?
 options: ["AI generated", "Human made"], 
 required: true, 
 name: 'participant_labelling_task' 
@@ -758,7 +758,7 @@ var emotional_impact_disclosure_details = {
 type: jsPsychSurveyText, 
 questions: [ 
 { 
-prompt: "How did the disclosure of AI / Human lavels affect you?", 
+prompt: "How did the disclosure of AI / Human labels affect you?", 
 rows: 7,  
 columns: 40,  
 name: "emotional_impact_disclosure_details", 
