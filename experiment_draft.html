@@ -24,7 +24,9 @@
 <!--Load Stimuli and custom plugins--> 
 <script src="https://realitybending.github.io/JSmisc/misc/utils.js"></script> 
 <script src="jspsych/plugins/plugin-survey-multi-choice.js"></script> 
- 
+<script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.4.0"></script>
+
+
 <!-- Default CSS --> 
 <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css" /> 
 <!--<script type="text/javascript" src="lib/vendors/jquery-2.2.0.min.js"></script>--> 
@@ -56,7 +58,7 @@ max-width: 100%;
  
 <script> 
  
- 
+// OSF link and data pipe create projects and link
 /* Initialize jsPsych ================================================================*/ 
 var jsPsych = initJsPsych({ 
 show_progress_bar: true, 
@@ -75,7 +77,8 @@ jsPsych.data
 }); 
  
 var timeline = []; 
- 
+participant_ID = jsPsych.randomization.randomID(10)
+
 /* Initialize Experiment =============================================================*/ 
 // Fullscreen Mode 
 timeline.push({ 
@@ -136,7 +139,7 @@ var participant_id = `${prolific_id}_${jspsych_id}`
 var study_id = jsPsych.data.getURLVariable("STUDY_ID") 
 var session_id = jsPsych.data.getURLVariable("SESSION_ID") 
  
-// Consent Screen 
+// Consent Screen replace
 var consent ={
         type: jsPsychHtmlButtonResponse,
         stimulus:
@@ -228,6 +231,16 @@ timeline.push(
 participant_info, 
 demographics) 
  
+// Save data via DataPipe this goes at end when works
+timeline.push({
+            type: jsPsychPipe,
+            action: "save",
+            experiment_id: "DoOfdX2FFR4H", // This is generated in the DataPipe interface
+            filename: `${participant_ID}.csv`,
+            data_string: () => jsPsych.data.get().csv(),
+        })
+
+
  // Media Literacy Assesment 
 var instructionsfilm = { 
 type: jsPsychHtmlButtonResponse, 
@@ -376,11 +389,21 @@ var likert_scale = [
 "Very",  
 "Extremely"  
 ];  
+
+var likert_scale2 = [  
+"0",  
+"A Little",  
+"Somewhat",  
+"Very",  
+"1"  
+];  
+
+
 var post_viewing_1 = {  
 type: jsPsychSurveyLikert,  
 questions: [  
 {prompt: "To what extent do you agree that this visual representation is... enjoyable, likable, pleasing, nice, appealing?", name: 'aesthetic_rating', labels: likert_scale}, // separate scales for each word 7 point likert strongly disagree to strongly agree
-{prompt: "How much are you moved by this image?", name: 'emotional_rating', labels: likert_scale},  // 7 point slider not at all to very much
+{prompt: "How much are you moved by this image?", name: 'emotional_rating', labels: likert_scale2},  // 7 point slider not at all to very much
 ],  
 data: {  
 screen: "post_viewing_1"  
@@ -549,14 +572,14 @@ var Experiment_Instructions_3 = {
 
 timeline.push(Experiment_Instructions_3);
 
-var video_stimuli = [
-  { stimulus: ['media/stimuli1.mp4'] },
-  { stimulus: ['media/stimuli2.mp4'] },
-  { stimulus: ['media/stimuli3.mp4'] },
-  { stimulus: ['media/stimuli4.mp4'] },
-  { stimulus: ['media/stimuli16.mp4'] },
-  { stimulus: ['media/stimuli18.mp4'] },
-];
+// var video_stimuli = [
+//   { stimulus: ['media/stimuli1.mp4'] },
+//   { stimulus: ['media/stimuli2.mp4'] },
+//   { stimulus: ['media/stimuli3.mp4'] },
+//   { stimulus: ['media/stimuli4.mp4'] },
+//   { stimulus: ['media/stimuli16.mp4'] },
+//   { stimulus: ['media/stimuli18.mp4'] },
+// ];
 
 var video_files = video_stimuli.map(item => item.stimulus).flat();
 
@@ -804,6 +827,7 @@ screen: "experience_details"
  
 timeline.push(experience_details); 
  
+
 jsPsych.run(timeline); 
 </script> 
 </html> 
