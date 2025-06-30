@@ -487,14 +487,9 @@ var video_stimuli = [
   { stimulus: ['media/stimuli3.mp4'] },
   { stimulus: ['media/stimuli4.mp4'] },
   { stimulus: ['media/stimuli16.mp4'] },
-  { stimulus: ['media/stimuli18.mp4'] },
+  { stimulus: ['media/stimuli18.mp4'] }
 ];
-var labels = ["Human Made", "AI Generated"]; 
 
-video_stimuli.forEach(function(item) {
-  var randomLabel = labels[Math.floor(Math.random() * labels.length)];
-  item.label = randomLabel;
-});
 
 var video_files = video_stimuli.map(item => item.stimulus).flat();
 
@@ -505,6 +500,27 @@ var preload = {
 
 timeline.push(preload);
 
+// Assign labels===================================================================================================
+var video_stimuli = jsPsych.randomization.shuffle(video_stimuli);
+
+// Assign half stimuli to each label
+for (let i = 0; i < video_stimuli.length; i++) {
+    video_stimuli[i].label = i < video_stimuli.length / 2 ? "Human" : "AI";
+}
+
+// Reshuffle after assigning labels
+var video_stimuli = jsPsych.randomization.shuffle(video_stimuli);
+
+// Label screen
+var fiction_cue = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: function() {
+    return jsPsych.timelineVariable('label');
+  },
+  trial_duration: 1000,
+  choices: ["NO_KEYS"]
+}
+
 var video_trial = {
   type: jsPsychVideoKeyboardResponse,
   stimulus: jsPsych.timelineVariable('stimulus'),
@@ -512,7 +528,6 @@ var video_trial = {
   response_allowed_while_playing: false,
   choices: "NO_KEYS",
   width: 1000,
-  prompt: jsPsych.timelineVariable('label'), 
   post_trial_gap: 500
 };
 
@@ -556,7 +571,7 @@ randomize_question_order: false
 };  
  
 var experiment_part_1 = {
-  timeline: [video_trial, post_viewing_1],
+  timeline: [fiction_cue, video_trial, post_viewing_1],
   timeline_variables: video_stimuli,
   randomize_order: false
 };
