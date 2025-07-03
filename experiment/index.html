@@ -8,25 +8,24 @@
         <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
 
         <!--Load all necessary plugins-->
-        <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-html-button-response.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-fullscreen.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-survey-text.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-preload.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-video-keyboard-response.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-browser-check.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-survey-likert.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-video-button-response.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-image-button-response.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-external-html.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-button-response"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-fullscreen"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-text"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-preload"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-video-keyboard-response"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-browser-check"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.3"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-video-button-response"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-image-button-response"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-external-html"></script>
         <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
         <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css" />
 
         <!--Load Stimuli and custom plugins-->
         <script src="https://realitybending.github.io/JSmisc/misc/utils.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice.js"></script>
         <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.4.0"></script>
         <script src="demographics.js"></script>
         <script src="fiction.js"></script>
@@ -63,17 +62,17 @@
         var jsPsych = initJsPsych({
             show_progress_bar: true,
             message_progress_bar: "Completion",
-            // on_finish: function () {
-            // jsPsych.data.displayData("json")
-            // jsPsych.data
-            // .get()
-            // .localSave(
-            // "json",
-            // `${jsPsych.data.get().values()[0]["participant_id"]
-            // }_FF.json`
-            // )
-            // window.location = "https://app.prolific.co/submissions/complete?cc=XXXXX" /* redirect to prolific when experiment is finished */
-            // },
+            on_finish: function () {
+                jsPsych.data.displayData("json")
+                // jsPsych.data
+                // .get()
+                // .localSave(
+                // "json",
+                // `${jsPsych.data.get().values()[0]["participant_id"]
+                // }_FF.json`
+                // )
+                // window.location = "https://app.prolific.co/submissions/complete?cc=XXXXX" /* redirect to prolific when experiment is finished */
+            },
         })
 
         var timeline = []
@@ -87,90 +86,18 @@
         // })
 
         // timeline.push(demographics_browser_info)
-        timeline.push(ConsentForm)
+        // timeline.push(ConsentForm)
         // timeline.push(demographic_questions)
-
         // TODO: add BAIT
 
-        // // Experiment Instructions Task 1
-        // var Experiment_Instructions = {
-        //         type: jsPsychHtmlButtonResponse,
-        //         stimulus:
-        //             "<h1>Task 1 Instructions</h1>" +
-        //             "<div style='text-align: left'>" +
-        //             "<p>In this part of the experiment, short clips will be shown on the screen with different labels.</p>" +
-        //             "<p>After each clip, you will be asked a series of questions, such as:</p><ul>" +
-        //             "<li><p>How emotional did you find the clip?</p></li>" +
-        //             "<li><p>How visually pleasing or beautiful was the clip? </p></li>" +
-        //             "<div style='text-align: left'>" +
-        //             "<p>We are interested in your first impressions. Please respond according to your gut feelings.</p>",
-        //             choices: ["Start"],
-        //         data: { screen: "Experiment_Instructions" },
-        //     }
+        // Experiment Part 1
+        timeline.push(fiction_preload)
+        timeline.push(Experiment_Instructions)
+        timeline.push(test_procedure_1)
 
-        //  timeline.push(Experiment_Instructions);
-
-        // timeline.push(test_procedure_1)
-
-        // // Experiment Part 2
-
-        // // Experiment Instructions 2
-        // var Experiment_Instructions_2 = {
-        //         type: jsPsychHtmlButtonResponse,
-        //         stimulus:
-        //             "<h1>Task 2</h1>" +
-        //             "<div style='text-align: left'>" +
-        //             "<p>In this part of the experiment, you will be shown each of the clips again.</p>" +
-        //             "<p>After each clip, you will be asked to identify to the best of your ability, how confident you are that the clip was AI generated, or human made</p><ul>" +
-        //             "<p>Please respond according to your gut feelings.</p>",
-        //             choices: ["Start"],
-        //         data: { screen: "Experiment_Instructions_2" },
-        //     }
-
-        // timeline.push(Experiment_Instructions_2);
-
-        // // Video screen phase 2
-        // var video_trial_2 = {
-        //   type: jsPsychVideoKeyboardResponse,
-        //   stimulus: jsPsych.timelineVariable('stimulus'),
-        //   trial_duration: 4000,
-        //   response_allowed_while_playing: false,
-        //   choices: "NO_KEYS",
-        //   width: 1000,
-        //   post_trial_gap: 500,
-        //   data: { screen: "video_phase_2" }
-        // };
-
-        // // Post Viewing Questions 3
-
-        // var likert_scale3 = [
-        // "AI generated",
-        // "-",
-        // "-",
-        // "Not sure",
-        // "-",
-        // "-",
-        // "Human made"
-        // ];
-
-        // var Participant_labelling_task = {
-        // type: jsPsychSurveyLikert,
-        // questions: [
-        // {prompt: "Please indicate your confidence that the clip was AI generated or human made:", name: 'Confidence in label', labels: likert_scale3},
-        // ],
-        // data: {
-        //   screen: "post_viewing_2"
-        // },
-        // randomize_question_order: true
-        // };
-
-        // var test_procedure_2 = {
-        //   timeline: [video_trial_2, Participant_labelling_task],
-        //   timeline_variables: video_stimuli,
-        //   randomize_order: false
-        // };
-
-        // timeline.push(test_procedure_2);
+        // Experiment Part 2
+        timeline.push(Experiment_Instructions_2)
+        timeline.push(test_procedure_2)
 
         // // Post_Questions
         // var Post_Questions ={
