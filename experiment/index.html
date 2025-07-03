@@ -2,37 +2,35 @@
 <html>
     <head>
         <!--create title shown in tab; not the same as header on webpage-->
-        <title>Neuroaesthetics_Cinema_Study</title>
+        <title>Cinema Study</title>
         <!--load the jsPsych library; set src to own path-->
-        <script src="jspsych/jspsych.js"></script>
+        <script src="https://unpkg.com/jspsych@7.3.1"></script>
+        <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
 
         <!--Load all necessary plugins-->
-        <script src="jspsych/plugins/plugin-html-keyboard-response.js"></script>
-        <script src="jspsych/plugins/plugin-html-button-response.js"></script>
-        <script src="jspsych/plugins/plugin-fullscreen.js"></script>
-        <script src="jspsych/plugins/plugin-survey-text.js"></script>
-        <script src="jspsych/plugins/plugin-preload.js"></script>
-        <script src="jspsych/plugins/plugin-image-keyboard-response.js"></script>
-        <script src="jspsych/plugins/plugin-video-keyboard-response.js"></script>
-        <script src="jspsych/plugins/plugin-survey-multi-choice.js"></script>
-        <script src="jspsych/plugins/plugin-browser-check.js"></script>
-        <script src="jspsych/plugins/plugin-survey-likert.js"></script>
-        <script src="jspsych/plugins/plugin-video-button-response.js"></script>
-        <script src="jspsych/plugins/plugin-image-button-response.js"></script>
-        <script src="jspsych/plugins/plugin-external-html.js"></script>
-        <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-button-response.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-fullscreen.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-text.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-preload.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-video-keyboard-response.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-browser-check.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-likert.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-video-button-response.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-image-button-response.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-external-html.js"></script>
         <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
         <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css" />
 
         <!--Load Stimuli and custom plugins-->
         <script src="https://realitybending.github.io/JSmisc/misc/utils.js"></script>
-        <script src="jspsych/plugins/plugin-survey-multi-choice.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice.js"></script>
         <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.4.0"></script>
         <script src="demographics.js"></script>
+        <script src="fiction.js"></script>
 
-        <!-- Default CSS -->
-        <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css" />
-        <!--<script type="text/javascript" src="lib/vendors/jquery-2.2.0.min.js"></script>-->
         <style>
             #jspsych-image-keyboard-response-stimulus {
                 /*adjust image stimuli params to fit screen*/
@@ -83,12 +81,12 @@
 
         /* Initialize Experiment =============================================================*/
         // Fullscreen Mode
-        timeline.push({
-            type: jsPsychFullscreen,
-            fullscreen_mode: true,
-        })
+        // timeline.push({
+        //     type: jsPsychFullscreen,
+        //     fullscreen_mode: true,
+        // })
 
-        timeline.push(demographics_browser_info)
+        // timeline.push(demographics_browser_info)
         timeline.push(ConsentForm)
         // timeline.push(demographic_questions)
 
@@ -111,110 +109,6 @@
         //     }
 
         //  timeline.push(Experiment_Instructions);
-
-        //Experiment Task 1
-        var video_stimuli = [
-            { stimulus: ["media/stimuli1.mp4"] },
-            { stimulus: ["media/stimuli2.mp4"] },
-            { stimulus: ["media/stimuli3.mp4"] },
-            { stimulus: ["media/stimuli4.mp4"] },
-            { stimulus: ["media/stimuli16.mp4"] },
-            { stimulus: ["media/stimuli18.mp4"] },
-        ]
-
-        var video_files = video_stimuli.map((item) => item.stimulus).flat()
-
-        var preload = {
-            type: jsPsychPreload,
-            video: video_files,
-        }
-
-        // timeline.push(preload)
-
-        // Assign labels===============================================================================================================================
-        var video_stimuli = jsPsych.randomization.shuffle(video_stimuli)
-
-        // Assign half stimuli to each label
-        for (let i = 0; i < video_stimuli.length; i++) {
-            video_stimuli[i].label = i < video_stimuli.length / 2 ? "Human" : "AI"
-        }
-
-        // Reshuffle after assigning labels
-        var video_stimuli = jsPsych.randomization.shuffle(video_stimuli)
-
-        // Label screen
-        var fiction_cue = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: function () {
-                return jsPsych.timelineVariable("label")
-
-                // Displays [object Object]
-                // var lbl = jsPsych.timelineVariable("label")
-                //     return (
-                //         "<div style='font-size:450%; position:fixed; text-align: center; top:50%; bottom:50%; right:20%; left:20%" +
-                //         "'><b>" + lbl +
-                //         "</b></div>"
-                //       )
-            },
-            trial_duration: 1000,
-            choices: ["NO_KEYS"],
-            data: { screen: "fiction_cue" },
-        }
-
-        // Video screen phase 1
-        var video_trial_1 = {
-            type: jsPsychVideoKeyboardResponse,
-            stimulus: jsPsych.timelineVariable("stimulus"),
-            trial_duration: 4000,
-            response_allowed_while_playing: false,
-            choices: "NO_KEYS",
-            width: 1000,
-            post_trial_gap: 500,
-            data: { screen: "video_phase_1" },
-        }
-
-        // Post Viewing Questions 1
-        var likert_scale = ["Strongly disagree", "-", "-", "-", "-", "-", "Strongly agree"]
-
-        var likert_scale2 = ["Not at all", "-", "-", "-", "-", "-", "Very much"]
-
-        var post_viewing_1 = {
-            type: jsPsychSurveyLikert,
-            questions: [
-                {
-                    prompt: "To what extent do you agree that this visual representation is enjoyable?",
-                    name: "enjoyable",
-                    labels: likert_scale,
-                },
-                {
-                    prompt: "To what extent do you agree that this visual representation is likable?",
-                    name: "likeable",
-                    labels: likert_scale,
-                },
-                {
-                    prompt: "To what extent do you agree that this visual representation is pleasing?",
-                    name: "pleasing",
-                    labels: likert_scale,
-                },
-                { prompt: "To what extent do you agree that this visual representation is nice?", name: "nice", labels: likert_scale },
-                {
-                    prompt: "To what extent do you agree that this visual representation is appealing?",
-                    name: "appealing",
-                    labels: likert_scale,
-                },
-                { prompt: "How much are you moved by this image?", name: "moved", labels: likert_scale2 },
-            ],
-            data: {
-                screen: "post_viewing_1",
-            },
-            randomize_question_order: false,
-        }
-
-        var test_procedure_1 = {
-            timeline: [fiction_cue, video_trial_1, post_viewing_1],
-            timeline_variables: video_stimuli,
-            randomize_order: false,
-        }
 
         // timeline.push(test_procedure_1)
 
