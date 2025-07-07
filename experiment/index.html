@@ -29,6 +29,7 @@
         <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.4.0"></script>
         <script src="demographics.js"></script>
         <script src="fiction.js"></script>
+        <script src="questionnaires.js"></script>
 
         <style>
             #jspsych-image-keyboard-response-stimulus {
@@ -63,7 +64,7 @@
             show_progress_bar: true,
             message_progress_bar: "Completion",
             on_finish: function () {
-                jsPsych.data.displayData("json")
+                // jsPsych.data.displayData("json")
                 // jsPsych.data
                 // .get()
                 // .localSave(
@@ -71,7 +72,7 @@
                 // `${jsPsych.data.get().values()[0]["participant_id"]
                 // }_FF.json`
                 // )
-                // window.location = "https://app.prolific.co/submissions/complete?cc=XXXXX" /* redirect to prolific when experiment is finished */
+                // window.location = ""
             },
         })
 
@@ -88,7 +89,7 @@
         // timeline.push(demographics_browser_info)
         // timeline.push(ConsentForm)
         // timeline.push(demographic_questions)
-        // TODO: add BAIT
+        timeline.push(bait)
 
         // Experiment Part 1
         timeline.push(fiction_preload)
