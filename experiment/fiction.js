@@ -8,9 +8,9 @@ var Experiment_Instructions = {
     "<p>After each clip, you will be asked a series of questions related to your aesthetic experience.</p>" +
     "<p>The first set of questions relates to how the clip makes you feel – the level of satisfaction from watching the clip and whether you liked how it looked:</p>" +
     "<ul>" +
-      "<li>To what extent do you agree that this visual representation is enjoyable to watch?</li>" +
-      "<li>To what extent do you agree that this visual representation is likeable?</li>" +
-      "<li>To what extent do you agree that this visual representation is pleasing to watch?</li>" +
+      "<li>To what extent do you agree that this clip is enjoyable?</li>" +
+      "<li>To what extent do you agree that this clip is likeable?</li>" +
+      "<li>To what extent do you agree that this clip is pleasing?</li>" +
     "</ul>" +
     "<p>The final questions relate to what you think the clip is trying to convey:</p>" +
     "<ul>" +
@@ -153,17 +153,17 @@ var post_viewing_1 = {
     type: jsPsychSurveyLikert,
     questions: [
         {
-            prompt: "To what extent do you agree that this visual representation is enjoyable?",
+            prompt: "To what extent do you agree that this clip is enjoyable?",
             name: "enjoyable",
             labels: ["Strongly disagree", "-", "-", "-", "-", "-", "Strongly agree"],
         },
         {
-            prompt: "To what extent do you agree that this visual representation is likable?",
+            prompt: "To what extent do you agree that this clip is likable?",
             name: "likeable",
             labels: ["Strongly disagree", "-", "-", "-", "-", "-", "Strongly agree"],
         },
         {
-            prompt: "To what extent do you agree that this visual representation is pleasing?",
+            prompt: "To what extent do you agree that this clip is pleasing?",
             name: "pleasing",
             labels: ["Strongly disagree", "-", "-", "-", "-", "-", "Strongly agree"],
         },
@@ -192,10 +192,10 @@ var test_procedure_1 = {
 var Experiment_Instructions_2 = {
     type: jsPsychHtmlButtonResponse,
     stimulus:
-        "<h1>Task 2</h1>" +
+        "<h1>Task 2 Instructions</h1>" +
         "<div style='text-align: left'>" +
         "<p>In this part of the experiment, you will be shown each of the clips again.</p>" +
-        "<p>After each clip, you will be asked to identify to the best of your ability, how confident you are that the clip was AI generated, or human made</p>" +
+        "<p>After each clip, you will be asked to identify to the best of your ability, how confident you are that the clip was AI-generated, or human-made</p>" +
         "<p>Please respond according to your gut feelings.</p>",
     choices: ["Start"],
     data: { screen: "Experiment_Instructions_2" },
