@@ -91,7 +91,6 @@ var video_stimuli = [
     { stimulus: ["media/stimuli67.mp4"] },
     { stimulus: ["media/stimuli68.mp4"] },
     { stimulus: ["media/stimuli69.mp4"] },
-    { stimulus: ["media/stimuli70.mp4"] },
 ]
 
 var fiction_preload = {
