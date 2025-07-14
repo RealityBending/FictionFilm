@@ -5,17 +5,20 @@ var Experiment_Instructions = {
     "<h1>Task 1 Instructions</h1>" +
     "<div style='text-align: left'>" +
     "<p>In this part of the experiment, short clips will be shown on the screen with different labels.</p>" +
-    "<p>After each clip, you will be asked a series of questions related to your aesthetic experience.</p><ul>" + 
-    "<p>The first set of questions relate to how the clip makes you feel - the level of satisfaction from watching the clip and whether you liked how it looked:</p><ul>" +
-    "<li><p>To what extent do you agree that this visual representation is enjoyable to watch?</p></li>" +
-    "<li><p>To what extent do you agree that this visual representation is likeable?</p></li>" +
-    "<li><p>To what extent do you agree that this visual representation is pleasing to watch??</p></li>" +
-    "<p>The final questions relate to what you think the clip is trying to convey:</p><ul>" +
-    "<li><p>How expressive would you describe the clip?</p></li>" +
-    "<li><p>How emotional would you describe the clip?</p></li>" +
-
-    "<div style='text-align: left'>" +
-    "<p>We are interested in your first impressions. Please respond according to your gut feelings.</p>",
+    "<p>After each clip, you will be asked a series of questions related to your aesthetic experience.</p>" +
+    "<p>The first set of questions relates to how the clip makes you feel – the level of satisfaction from watching the clip and whether you liked how it looked:</p>" +
+    "<ul>" +
+      "<li>To what extent do you agree that this visual representation is enjoyable to watch?</li>" +
+      "<li>To what extent do you agree that this visual representation is likeable?</li>" +
+      "<li>To what extent do you agree that this visual representation is pleasing to watch?</li>" +
+    "</ul>" +
+    "<p>The final questions relate to what you think the clip is trying to convey:</p>" +
+    "<ul>" +
+      "<li>How expressive would you describe the clip?</li>" +
+      "<li>How emotional would you describe the clip?</li>" +
+    "</ul>" +
+    "<p>We are interested in your first impressions. Please respond according to your gut feelings.</p>" +
+    "</div>",
     choices: ["Start"],
     data: { screen: "Experiment_Instructions" },
 }
@@ -192,7 +195,7 @@ var Experiment_Instructions_2 = {
         "<h1>Task 2</h1>" +
         "<div style='text-align: left'>" +
         "<p>In this part of the experiment, you will be shown each of the clips again.</p>" +
-        "<p>After each clip, you will be asked to identify to the best of your ability, how confident you are that the clip was AI generated, or human made</p><ul>" +
+        "<p>After each clip, you will be asked to identify to the best of your ability, how confident you are that the clip was AI generated, or human made</p>" +
         "<p>Please respond according to your gut feelings.</p>",
     choices: ["Start"],
     data: { screen: "Experiment_Instructions_2" },
