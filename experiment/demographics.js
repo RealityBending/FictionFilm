@@ -34,7 +34,7 @@ const ConsentForm = {
             "Thank you for considering to take part in this study conducted by Dr Dominique Makowski from the University of Sussex and his team (see contact information below).</p>" +
             // Description
             "<p align='left'><b>Why have I been invited and what will I do?</b><br>" +
-            "The aim of this study is to validate a new questionnaire measuring Interoception. Interoception refers to the sensing, interpretation and processing of internal bodily signals (e.g., feeling changes in the way one's heart beats). " +
+            "The aim of this study is to assess how you react to media.  " +
             "The whole experiment will take you <b style='color:#FF5722;'>~30 min</b> to complete. Please make you sure that you are <b>attentive and in a quiet environment</b>, and that you have time to complete it in one go.</p>" +
             // Results and personal information
             "<p align='left'><b>What will happen to the results and my personal information?</b><br>" +
@@ -56,7 +56,7 @@ const ConsentForm = {
         // End
         text +=
             "<li align='left'>By participating, you agree to follow the instructions and provide honest answers. If you do not wish to participate or if you don't have the time, simply close your browser.</li></p>" +
-            "<p align='left'><br><sub><sup>For further information about this research, or if you have any concerns, please contact Dr Dominique Makowski (<i style='color:DodgerBlue;'>D.Makowski@sussex.ac.uk</i>) and/or Ana Neves (<i style='color:DodgerBlue;'>A.Neves@sussex.ac.uk</i>). This research has been approved (ER/EB672/2) by the Sciences & Technology Cross-Schools Research Ethics Committee (C-REC) (<i style='color:DodgerBlue;'>crecscitec@sussex.ac.uk</i>). The University of Sussex has insurance in place to cover its legal liabilities in respect of this study.</sup></sub></p>"
+            "<p align='left'><br><sub><sup>For further information about this research, or if you have any concerns, please contact Dr Dominique Makowski (<i style='color:DodgerBlue;'>D.Makowski@sussex.ac.uk</i>) and/or Milly Houldey (<i style='color:DodgerBlue;'>mh978@sussex.ac.uk</i>). This research has been approved (ER/EB672/2) by the Sciences & Technology Cross-Schools Research Ethics Committee (C-REC) (<i style='color:DodgerBlue;'>crecscitec@sussex.ac.uk</i>). The University of Sussex has insurance in place to cover its legal liabilities in respect of this study.</sup></sub></p>"
 
         // Return Survey
         return {
@@ -206,41 +206,41 @@ var demographic_questions = {
                     },
                 ],
             },
-            // {
-            //     elements: [
-            //         {
-            //             title: "How would you describe your ethnicity?",
-            //             name: "Ethnicity",
-            //             type: "radiogroup",
-            //             choices: [
-            //                 "White",
-            //                 "Black",
-            //                 "Hispanic/Latino",
-            //                 "Middle Eastern/North African",
-            //                 "South Asian",
-            //                 "East Asian",
-            //                 "Southeast Asian",
-            //                 "Mixed",
-            //                 "Prefer not to say",
-            //             ],
-            //             showOtherItem: true,
-            //             otherText: "Other",
-            //             otherPlaceholder: "Please specify",
-            //             isRequired: false,
-            //             colCount: 1,
-            //         },
-            //         {
-            //             title: "In which country are you currently living?",
-            //             name: "Country",
-            //             type: "dropdown",
-            //             choicesByUrl: {
-            //                 url: "https://surveyjs.io/api/CountriesExample",
-            //             },
-            //             placeholder: "e.g., France",
-            //             isRequired: false,
-            //         },
-            //     ],
-            // },
+            {
+                elements: [
+                    {
+                        title: "How would you describe your ethnicity?",
+                        name: "Ethnicity",
+                        type: "radiogroup",
+                        choices: [
+                            "White",
+                            "Black",
+                            "Hispanic/Latino",
+                            "Middle Eastern/North African",
+                            "South Asian",
+                            "East Asian",
+                            "Southeast Asian",
+                            "Mixed",
+                            "Prefer not to say",
+                        ],
+                        showOtherItem: true,
+                        otherText: "Other",
+                        otherPlaceholder: "Please specify",
+                        isRequired: false,
+                        colCount: 1,
+                    },
+                    {
+                        title: "In which country are you currently living?",
+                        name: "Country",
+                        type: "dropdown",
+                        choicesByUrl: {
+                            url: "https://surveyjs.io/api/CountriesExample",
+                        },
+                        placeholder: "e.g., France",
+                        isRequired: false,
+                    },
+                ],
+            },
         ],
     },
     data: {
@@ -248,103 +248,103 @@ var demographic_questions = {
     },
 }
 
-//  // Media Literacy Assesment
-// var instructionsfilm = {
-// type: jsPsychHtmlButtonResponse,
-// stimulus:
-// "<h1>Pre Task Questions 1/2</h1>" +
-// "<p> Due to the nature of this study, we are interested in your overall consumption, knowledge and expertise on media (TV, Film etc.)</p>" +
-// "<p>Please read the statements carefully and indicate the extent to which you agree with each statement.</p>",
-// choices: ["Continue"],
-// data: { screen: "instructionsfilm" },
-// }
-// timeline.push(instructionsfilm)
+ // Media Literacy Assessment
+var instructionsfilm = {
+type: jsPsychHtmlButtonResponse,
+stimulus:
+"<h1>Pre Task Questions 1/2</h1>" +
+"<p> Due to the nature of this study, we are interested in your overall consumption, knowledge and expertise on media (TV, Film etc.)</p>" +
+"<p>Please read the statements carefully and indicate the extent to which you agree with each statement.</p>",
+choices: ["Continue"],
+data: { screen: "instructionsfilm" },
+}
+timeline.push(instructionsfilm)
 
-// // Media Literacy
-// var likert_scale = [
-// "Not at all",
-// "A Little",
-// "Somewhat",
-// "Very",
-// "Extremely"
-// ];
+// Media Literacy ------------------------------------------------------- TO ADD before AI attitudes after demographics (includes media professional section below it)
+var likert_scale = [
+"Not at all",
+"A Little",
+"Somewhat",
+"Very",
+"Extremely"
+];
 
-// var media_literacy = {
-// type: jsPsychSurveyLikert,
-// questions: [
-// {prompt: "How much would you say watching films is part of your routine?", name: 'film_routine', labels: likert_scale},
-// {prompt: "How much do you enjoy watching films?", name: 'film_enjoyment', labels: likert_scale},
-// {prompt: "How confident are you in evaluating the quality of a film?", name: 'film_quality', labels: likert_scale},
-// {prompt: "How confident are you in identifying film messages or themes?", name: 'film_identification', labels: likert_scale},
-// {prompt: "How confident are you in recognising the emotions a film tries to convey?", name: 'film_empathy', labels: likert_scale},
-// ],
-// data: {
-// screen: "Pre-screening"
-// },
-// randomize_question_order: true
-// };
+var media_literacy = {
+type: jsPsychSurveyLikert,
+questions: [
+{prompt: "How much would you say watching films is part of your routine?", name: 'film_routine', labels: likert_scale},
+{prompt: "How much do you enjoy watching films?", name: 'film_enjoyment', labels: likert_scale},
+{prompt: "How confident are you in evaluating the quality of a film?", name: 'film_quality', labels: likert_scale},
+{prompt: "How confident are you in identifying film messages or themes?", name: 'film_identification', labels: likert_scale},
+{prompt: "How confident are you in recognising the emotions a film tries to convey?", name: 'film_empathy', labels: likert_scale},
+],
+data: {
+screen: "Pre-screening"
+},
+randomize_question_order: true
+};
 
-// timeline.push(media_literacy);
+timeline.push(media_literacy);
 
-// // Media professional?
-// var media_professional = {
-// type: jsPsychSurveyMultiChoice,
-// questions: [
-// {
-// prompt: "Do you, or have you ever worked in the media industry (e.g., film, TV, journalism, animation, production)?",
-// options: ["Yes", "No"],
-// required: true,
-// name: 'media_professional'
-// },
-// ],
-// data: {
-// screen: "Pre-screening"
-// }
-// };
+// Media professional?
+var media_professional = {
+type: jsPsychSurveyMultiChoice,
+questions: [
+{
+prompt: "Do you, or have you ever worked in the media industry (e.g., film, TV, journalism, animation, production)?",
+options: ["Yes", "No"],
+required: true,
+name: 'media_professional'
+},
+],
+data: {
+screen: "Pre-screening"
+}
+};
 
-// var media_professional_details = {
-// type:jsPsychSurveyMultiChoice,
-// questions: [
-// {
-// prompt: "What area of the media do you work in?",
-// options:[
-// "Editorial",
-// "Production",
-// "Other"
-// ],
-// name: 'media_area',
-// required: true
-// },
-// {
-// prompt: "What is your seniority level?",
-// options: [
-// "Entry",
-// "Junior",
-// "Mid-level",
-// "Senior"
-// ],
-// name: 'seniority',
-// required: true
-// },
-// ],
-// data: {
-// screen: "Pre-screening"
-// }
-// };
+var media_professional_details = {
+type:jsPsychSurveyMultiChoice,
+questions: [
+{
+prompt: "What area of the media do you work in?",
+options:[
+"Editorial",
+"Production",
+"Other"
+],
+name: 'media_area',
+required: true
+},
+{
+prompt: "What is your seniority level?",
+options: [
+"Entry",
+"Junior",
+"Mid-level",
+"Senior"
+],
+name: 'seniority',
+required: true
+},
+],
+data: {
+screen: "Pre-screening"
+}
+};
 
-// timeline.push(media_professional);
+timeline.push(media_professional);
 
-// // timeline.push({
-// // timeline: [media_professional_details],
-// // conditional_function: function () {
-// // var last_response = jsPsych.data.get().filter({}).values().pop();
-// // if (last_response && last_response.response && last_response.response['media_professional'] === "Yes") {
-// // return true;
-// // } else {
-// // return false;
-// // }
-// // }
-// // });
+timeline.push({
+timeline: [media_professional_details],
+conditional_function: function () {
+var last_response = jsPsych.data.get().filter({}).values().pop();
+if (last_response && last_response.response && last_response.response['media_professional'] === "Yes") {
+return true;
+} else {
+return false;
+}
+}
+});
 
 // Feedback, Debrief, Thank you Screen
 var experiment_feedback = {
@@ -383,6 +383,21 @@ var experiment_feedback = {
                     {
                         type: "comment",
                         name: "Feedback_Text",
+                        title: "Did you notice anything unusual about the clips or the way they were labelled?",
+                        isRequired: false,
+                    },
+                    {
+                        type: "rating",
+                        name: "AI_perception_change",
+                        title: "Do you feel your attitudes toward AI have changed following this experiment? (0, No; 4, Yes)",
+                        description: "Please be honest!",
+                        isRequired: false,
+                        rateMin: 0,
+                        rateMax: 4,
+                    },
+                    {
+                        type: "comment",
+                        name: "Feedback_Text",
                         title: "Anything else you would like to share with us?",
                         description:
                             "Please note that these comments might be shared publicly as part of the results of this study - avoid sharing personal information.",
@@ -411,9 +426,11 @@ var demographics_debriefing = {
                         html:
                             "<img src='https://blogs.brighton.ac.uk/sussexwrites/files/2019/06/University-of-Sussex-logo-transparent.png' width='150px' align='right'/><br><br><br><br><br>" +
                             "<h2>Debriefing</h2>" +
-                            "<p align='left'>The purpose of this study was to create and validate a new questionnaire measuring interoception. " +
-                            "Interoception involves being aware of changes happening inside our bodies, both physiological (e.g., our heart rate) and emotional, and it plays a crucial role in how we perceive and experience the world around us. It has been related to emotion regulation, self-awareness and overall mental well-being. " +
-                            "<p align='left'><b>Thank you again!</b> Your participation in this study will be kept completely confidential. If you have any questions or concerns about the project, please contact D.Makowski@sussex.ac.uk. and/or A.Neves@Sussex.ac.uk </p>" +
+                            "<p align='left'>The video labels (e.g., AI-generated or Human-made) were randomly assigned to all the clips to assess how disclosure of AI use influences viewers’ perceptions of cinema relevant stimuli. " +
+                            "This study is designed to explore how people engage with visual media depending on what they are told about its origin.  " +
+                            "All the clips were in fact created by professional filmmakers, and no AI was used. " +
+                            "Without this deception, it would not be possible to isolate the psychological effects of disclosure from the actual qualities of AI-generated material. " +
+                            "<p align='left'><b>Thank you again!</b> Your participation in this study will be kept completely confidential. If you have any questions or concerns about the project, please contact D.Makowski@sussex.ac.uk. and/or mh978@Sussex.ac.uk </p>" +
                             "<p>To complete your participation in this study, click on 'Continue' and <b>wait until your responses have been successfully saved</b> before closing the tab.</p> ",
                     },
                 ],

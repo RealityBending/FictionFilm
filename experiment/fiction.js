@@ -2,14 +2,20 @@
 var Experiment_Instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus:
-        "<h1>Task 1 Instructions</h1>" +
-        "<div style='text-align: left'>" +
-        "<p>In this part of the experiment, short clips will be shown on the screen with different labels.</p>" +
-        "<p>After each clip, you will be asked a series of questions, such as:</p><ul>" +
-        "<li><p>How emotional did you find the clip?</p></li>" +
-        "<li><p>How visually pleasing or beautiful was the clip? </p></li>" +
-        "<div style='text-align: left'>" +
-        "<p>We are interested in your first impressions. Please respond according to your gut feelings.</p>",
+    "<h1>Task 1 Instructions</h1>" +
+    "<div style='text-align: left'>" +
+    "<p>In this part of the experiment, short clips will be shown on the screen with different labels.</p>" +
+    "<p>After each clip, you will be asked a series of questions related to your aesthetic experience.</p><ul>" + 
+    "<p>The first set of questions relate to how the clip makes you feel - the level of satisfaction from watching the clip and whether you liked how it looked:</p><ul>" +
+    "<li><p>To what extent do you agree that this visual representation is enjoyable to watch?</p></li>" +
+    "<li><p>To what extent do you agree that this visual representation is likeable?</p></li>" +
+    "<li><p>To what extent do you agree that this visual representation is pleasing to watch??</p></li>" +
+    "<p>The final questions relate to what you think the clip is trying to convey:</p><ul>" +
+    "<li><p>How expressive would you describe the clip?</p></li>" +
+    "<li><p>How emotional would you describe the clip?</p></li>" +
+
+    "<div style='text-align: left'>" +
+    "<p>We are interested in your first impressions. Please respond according to your gut feelings.</p>",
     choices: ["Start"],
     data: { screen: "Experiment_Instructions" },
 }
@@ -95,7 +101,7 @@ var fiction_preload = {
 
 // Assign half stimuli to each label
 for (let i = 0; i < video_stimuli.length; i++) {
-    video_stimuli[i].label = i < video_stimuli.length / 2 ? "Human" : "AI"
+    video_stimuli[i].label = i < video_stimuli.length / 2 ? "Human-made" : "AI-generated"
 }
 
 // Reshuffle after assigning labels
