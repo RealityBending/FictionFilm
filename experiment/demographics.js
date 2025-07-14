@@ -248,103 +248,200 @@ var demographic_questions = {
     },
 }
 
- // Media Literacy Assessment
-var instructionsfilm = {
-type: jsPsychHtmlButtonResponse,
-stimulus:
-"<h1>Pre Task Questions 1/2</h1>" +
-"<p> Due to the nature of this study, we are interested in your overall consumption, knowledge and expertise on media (TV, Film etc.)</p>" +
-"<p>Please read the statements carefully and indicate the extent to which you agree with each statement.</p>",
-choices: ["Continue"],
-data: { screen: "instructionsfilm" },
+// Media Literacy and AI Expertise ========================================================================================================
+
+var  media = {
+    type: jsPsychSurvey,
+    survey_json: {
+        title: "Your Relationship with Film and Media",
+        description: "Due to the nature of this study, we are interested in your overall consumption, knowledge and expertise on media (TV, Film etc.). Please read the statements carefully and indicate the extent to which you agree with each statement.",
+        completeText: "Continue",
+        pageNextText: "Next",
+        pagePrevText: "Previous",
+        goNextPageAutomatic: false,
+        showQuestionNumbers: false,
+        pages: [
+            {
+                elements: [
+                    {
+                        title: "How much would you say watching films is part of your routine?",
+                        name: "film_routine",
+                        type: "rating",
+                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        isRequired: true,
+                        colCount: 0,
+                    },
+                    {
+                        title: "How much do you enjoy watching films?",
+                        name: "film_enjoyment",
+                        type: "rating",
+                        rateValues:["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        isRequired: true,
+                        colCount: 0,
+                    },
+                    {
+                        title: "How confident are you in evaluating the quality of a film?",
+                        name: "film_quality",
+                        type: "rating",
+                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        isRequired: true,
+                        colCount: 0,
+                    },
+                     {
+                        title: "How confident are you in identifying film messages or themes?",
+                        name: "film_identification",
+                        type: "rating",
+                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        isRequired: true,
+                        colCount: 0,
+                    },
+                      {
+                        title: "How confident are you in recognising the emotions a film tries to convey?",
+                        name: "film_empathy",
+                        type: "rating",
+                        rateValues:["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        isRequired: true,
+                        colCount: 0,
+                    },
+                ],
+            },
+            {
+                elements: [
+                    {
+                        title: "Do you, or have you ever worked in the media industry (e.g., film, TV, journalism, animation, production)?",
+                        name: "media_professional",
+                        type: "boolean",
+                        isRequired: true,
+
+                    },
+                    {
+                        visibleIf: "{media_professional} == true",
+                        title: "What area of the media do you work in?",
+                        name: "media_area",
+                        type: "radiogroup",
+                        choices: ["Editorial", "Production", "Other"],
+                        isRequired: true,
+                    },
+                    {
+                        visibleIf: "{media_professional} == true",
+                        title: "What is your seniority level?",
+                        name: "seniority",
+                        type: "radiogroup",
+                        choices: ["Entry", "Junior", "Mid-level", "Senior"],
+                        isRequired: true,
+                    },
+                ],
+            },             
+        ],
+    },
+    data: {
+        screen: "media",
+    },
 }
-timeline.push(instructionsfilm)
 
-// Media Literacy ------------------------------------------------------- TO ADD before AI attitudes after demographics (includes media professional section below it)
-var likert_scale = [
-"Not at all",
-"A Little",
-"Somewhat",
-"Very",
-"Extremely"
-];
 
-var media_literacy = {
-type: jsPsychSurveyLikert,
-questions: [
-{prompt: "How much would you say watching films is part of your routine?", name: 'film_routine', labels: likert_scale},
-{prompt: "How much do you enjoy watching films?", name: 'film_enjoyment', labels: likert_scale},
-{prompt: "How confident are you in evaluating the quality of a film?", name: 'film_quality', labels: likert_scale},
-{prompt: "How confident are you in identifying film messages or themes?", name: 'film_identification', labels: likert_scale},
-{prompt: "How confident are you in recognising the emotions a film tries to convey?", name: 'film_empathy', labels: likert_scale},
-],
-data: {
-screen: "Pre-screening"
-},
-randomize_question_order: true
-};
+        
 
-timeline.push(media_literacy);
 
-// Media professional?
-var media_professional = {
-type: jsPsychSurveyMultiChoice,
-questions: [
-{
-prompt: "Do you, or have you ever worked in the media industry (e.g., film, TV, journalism, animation, production)?",
-options: ["Yes", "No"],
-required: true,
-name: 'media_professional'
-},
-],
-data: {
-screen: "Pre-screening"
-}
-};
 
-var media_professional_details = {
-type:jsPsychSurveyMultiChoice,
-questions: [
-{
-prompt: "What area of the media do you work in?",
-options:[
-"Editorial",
-"Production",
-"Other"
-],
-name: 'media_area',
-required: true
-},
-{
-prompt: "What is your seniority level?",
-options: [
-"Entry",
-"Junior",
-"Mid-level",
-"Senior"
-],
-name: 'seniority',
-required: true
-},
-],
-data: {
-screen: "Pre-screening"
-}
-};
+//  // Media Literacy Assessment
+// var instructionsfilm = {
+// type: jsPsychHtmlButtonResponse,
+// stimulus:
+// "<h1>Pre Task Questions 1/2</h1>" +
+// "<p> Due to the nature of this study, we are interested in your overall consumption, knowledge and expertise on media (TV, Film etc.)</p>" +
+// "<p>Please read the statements carefully and indicate the extent to which you agree with each statement.</p>",
+// choices: ["Continue"],
+// data: { screen: "instructionsfilm" },
+// }
+// timeline.push(instructionsfilm)
 
-timeline.push(media_professional);
 
-timeline.push({
-timeline: [media_professional_details],
-conditional_function: function () {
-var last_response = jsPsych.data.get().filter({}).values().pop();
-if (last_response && last_response.response && last_response.response['media_professional'] === "Yes") {
-return true;
-} else {
-return false;
-}
-}
-});
+// // Media Literacy ------------------------------------------------------- TO ADD before AI attitudes after demographics (includes media professional section below it)
+// var likert_scale = [
+// "Not at all",
+// "A Little",
+// "Somewhat",
+// "Very",
+// "Very"
+// ];
+
+// var media_literacy = {
+// type: jsPsychSurveyLikert,
+// questions: [
+// {prompt: "How much would you say watching films is part of your routine?", name: 'film_routine', labels: likert_scale},
+// {prompt: "How much do you enjoy watching films?", name: 'film_enjoyment', labels: likert_scale},
+// {prompt: "How confident are you in evaluating the quality of a film?", name: 'film_quality', labels: likert_scale},
+// {prompt: "How confident are you in identifying film messages or themes?", name: 'film_identification', labels: likert_scale},
+// {prompt: "How confident are you in recognising the emotions a film tries to convey?", name: 'film_empathy', labels: likert_scale},
+// ],
+// data: {
+// screen: "Pre-screening"
+// },
+// randomize_question_order: true
+// };
+
+// timeline.push(media_literacy);
+
+// // Media professional?
+// var media_professional = {
+// type: jsPsychSurveyMultiChoice,
+// questions: [
+// {
+// prompt: "Do you, or have you ever worked in the media industry (e.g., film, TV, journalism, animation, production)?",
+// options: ["Yes", "No"],
+// required: true,
+// name: 'media_professional'
+// },
+// ],
+// data: {
+// screen: "Pre-screening"
+// }
+// };
+
+// var media_professional_details = {
+// type:jsPsychSurveyMultiChoice,
+// questions: [
+// {
+// prompt: "What area of the media do you work in?",
+// options:[
+// "Editorial",
+// "Production",
+// "Other"
+// ],
+// name: 'media_area',
+// required: true
+// },
+// {
+// prompt: "What is your seniority level?",
+// options: [
+// "Entry",
+// "Junior",
+// "Mid-level",
+// "Senior"
+// ],
+// name: 'seniority',
+// required: true
+// },
+// ],
+// data: {
+// screen: "Pre-screening"
+// }
+// };
+
+// timeline.push(media_professional);
+
+// timeline.push({
+// timeline: [media_professional_details],
+// conditional_function: function () {
+// var last_response = jsPsych.data.get().filter({}).values().pop();
+// if (last_response && last_response.response && last_response.response['media_professional'] === "Yes") {
+// return true;
+// } else {
+// return false;
+// }
+// }
+// });
 
 // Feedback, Debrief, Thank you Screen
 var experiment_feedback = {
