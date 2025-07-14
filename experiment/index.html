@@ -86,11 +86,10 @@
         //     fullscreen_mode: true,
         // })
 
-        // timeline.push(demographics_browser_info)
-        // timeline.push(ConsentForm)
-        // timeline.push(demographic_questions)
+        timeline.push(demographics_browser_info)
+        timeline.push(ConsentForm)
+        timeline.push(demographic_questions)
         timeline.push(media)
-
         timeline.push(bait)
 
         // Experiment Part 1
@@ -111,6 +110,7 @@
         //   data_string: () => jsPsych.data.get().csv(),
         // })
 
+        timeline.push(experiment_feedback);
         timeline.push(demographics_debriefing);
         jsPsych.run(timeline)
     </script>
