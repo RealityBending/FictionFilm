@@ -340,109 +340,6 @@ var  media = {
 }
 
 
-        
-
-
-
-//  // Media Literacy Assessment
-// var instructionsfilm = {
-// type: jsPsychHtmlButtonResponse,
-// stimulus:
-// "<h1>Pre Task Questions 1/2</h1>" +
-// "<p> Due to the nature of this study, we are interested in your overall consumption, knowledge and expertise on media (TV, Film etc.)</p>" +
-// "<p>Please read the statements carefully and indicate the extent to which you agree with each statement.</p>",
-// choices: ["Continue"],
-// data: { screen: "instructionsfilm" },
-// }
-// timeline.push(instructionsfilm)
-
-
-// // Media Literacy ------------------------------------------------------- TO ADD before AI attitudes after demographics (includes media professional section below it)
-// var likert_scale = [
-// "Not at all",
-// "A Little",
-// "Somewhat",
-// "Very",
-// "Very"
-// ];
-
-// var media_literacy = {
-// type: jsPsychSurveyLikert,
-// questions: [
-// {prompt: "How much would you say watching films is part of your routine?", name: 'film_routine', labels: likert_scale},
-// {prompt: "How much do you enjoy watching films?", name: 'film_enjoyment', labels: likert_scale},
-// {prompt: "How confident are you in evaluating the quality of a film?", name: 'film_quality', labels: likert_scale},
-// {prompt: "How confident are you in identifying film messages or themes?", name: 'film_identification', labels: likert_scale},
-// {prompt: "How confident are you in recognising the emotions a film tries to convey?", name: 'film_empathy', labels: likert_scale},
-// ],
-// data: {
-// screen: "Pre-screening"
-// },
-// randomize_question_order: true
-// };
-
-// timeline.push(media_literacy);
-
-// // Media professional?
-// var media_professional = {
-// type: jsPsychSurveyMultiChoice,
-// questions: [
-// {
-// prompt: "Do you, or have you ever worked in the media industry (e.g., film, TV, journalism, animation, production)?",
-// options: ["Yes", "No"],
-// required: true,
-// name: 'media_professional'
-// },
-// ],
-// data: {
-// screen: "Pre-screening"
-// }
-// };
-
-// var media_professional_details = {
-// type:jsPsychSurveyMultiChoice,
-// questions: [
-// {
-// prompt: "What area of the media do you work in?",
-// options:[
-// "Editorial",
-// "Production",
-// "Other"
-// ],
-// name: 'media_area',
-// required: true
-// },
-// {
-// prompt: "What is your seniority level?",
-// options: [
-// "Entry",
-// "Junior",
-// "Mid-level",
-// "Senior"
-// ],
-// name: 'seniority',
-// required: true
-// },
-// ],
-// data: {
-// screen: "Pre-screening"
-// }
-// };
-
-// timeline.push(media_professional);
-
-// timeline.push({
-// timeline: [media_professional_details],
-// conditional_function: function () {
-// var last_response = jsPsych.data.get().filter({}).values().pop();
-// if (last_response && last_response.response && last_response.response['media_professional'] === "Yes") {
-// return true;
-// } else {
-// return false;
-// }
-// }
-// });
-
 // Feedback, Debrief, Thank you Screen
 var experiment_feedback = {
     type: jsPsychSurvey,
@@ -523,7 +420,7 @@ var demographics_debriefing = {
                         html:
                             "<img src='https://blogs.brighton.ac.uk/sussexwrites/files/2019/06/University-of-Sussex-logo-transparent.png' width='150px' align='right'/><br><br><br><br><br>" +
                             "<h2>Debriefing</h2>" +
-                            "<p align='left'>The video labels (e.g., AI-generated or Human-made) were randomly assigned to all the clips to assess how disclosure of AI use influences viewers’ perceptions of cinema relevant stimuli. " +
+                            "<p align='left'>The video labels (e.g., AI-generated or Human-made) were randomly assigned to all the clips to assess how disclosure of AI use influences viewer perceptions of cinema relevant stimuli. " +
                             "This study is designed to explore how people engage with visual media depending on what they are told about its origin.  " +
                             "All the clips were in fact created by professional filmmakers, and no AI was used. " +
                             "Without this deception, it would not be possible to isolate the psychological effects of disclosure from the actual qualities of AI-generated material. " +

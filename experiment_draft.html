@@ -591,8 +591,8 @@ questions: [
 {prompt: "To what extent do you agree that this visual representation is enjoyable?", name: 'enjoyable', labels: likert_scale},
 {prompt: "To what extent do you agree that this visual representation is likable?", name: 'likeable', labels: likert_scale}, 
 {prompt: "To what extent do you agree that this visual representation is pleasing?", name: 'pleasing', labels: likert_scale}, 
-{prompt: "How expressive would you describe the clip you just watched??", name: 'moved', labels: likert_scale2},  
-{prompt: "How emotional would you describe the clip you just watched??", name: 'moved', labels: likert_scale2},  
+{prompt: "How expressive would you describe the clip you just watched?", name: 'expressive', labels: likert_scale2},  
+{prompt: "How emotional would you describe the clip you just watched?", name: 'emotional', labels: likert_scale2},  
 
 ],  
 data: {  
@@ -777,7 +777,15 @@ var changing_perceptions_ai = {
 type: jsPsychSurveyMultiChoice, 
 questions: [ 
 { 
-prompt: "Did participating in this study change how you feel about AI-generated content?", 
+prompt: "{
+                        type: "rating",
+                        name: "AI_suspect",
+                        title: "To what extent did you suspect the AI generated labels might have been false?",
+                        description: "Please be honest!",
+                        isRequired: false,
+                        rateMin: 0,
+                        rateMax: 4,
+                    },", 
 options: ["Yes", "No"], 
 required: true, 
 name: 'changing_perceptions_ai' 
