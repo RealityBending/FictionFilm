@@ -2,23 +2,23 @@
 var Experiment_Instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus:
-    "<h1>Task 1 Instructions</h1>" +
-    "<div style='text-align: left'>" +
-    "<p>In this part of the experiment, short clips will be shown on the screen with different labels.</p>" +
-    "<p>After each clip, you will be asked a series of questions related to your aesthetic experience.</p>" +
-    "<p>The first set of questions relate to how the clip makes you feel (the level of satisfaction from watching the clip and whether you liked how it looked):</p>" +
-    "<ul>" +
-      "<li>To what extent do you agree that this clip is enjoyable?</li>" +
-      "<li>To what extent do you agree that this clip is likeable?</li>" +
-      "<li>To what extent do you agree that this clip is pleasing?</li>" +
-    "</ul>" +
-    "<p>The final questions relate to what you think the clip is trying to convey or show:</p>" +
-    "<ul>" +
-      "<li>How expressive would you describe the clip?</li>" +
-      "<li>How emotional would you describe the clip?</li>" +
-    "</ul>" +
-    "<p>We are interested in your first impressions. Please respond according to your gut feelings.</p>" +
-    "</div>",
+        "<h1>Task 1 Instructions</h1>" +
+        "<div style='text-align: left'>" +
+        "<p>In this part of the experiment, short clips will be shown on the screen with different labels.</p>" +
+        "<p>After each clip, you will be asked a series of questions related to your aesthetic experience.</p>" +
+        "<p>The first set of questions relate to how the clip makes you feel (the level of satisfaction from watching the clip and whether you liked how it looked):</p>" +
+        "<ul>" +
+        "<li>To what extent do you agree that this clip is enjoyable?</li>" +
+        "<li>To what extent do you agree that this clip is likeable?</li>" +
+        "<li>To what extent do you agree that this clip is pleasing?</li>" +
+        "</ul>" +
+        "<p>The final questions relate to what you think the clip is trying to convey or show:</p>" +
+        "<ul>" +
+        "<li>How expressive would you describe the clip?</li>" +
+        "<li>How emotional would you describe the clip?</li>" +
+        "</ul>" +
+        "<p>We are interested in your first impressions. Please respond according to your gut feelings.</p>" +
+        "</div>",
     choices: ["Start"],
     data: { screen: "Experiment_Instructions" },
 }
@@ -110,7 +110,7 @@ for (let i = 0; i < video_stimuli.length; i++) {
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
-        ;[array[i], array[j]] = [array[j], array[i]]
+            ;[array[i], array[j]] = [array[j], array[i]]
     }
     return array
 }
@@ -167,15 +167,17 @@ var post_viewing_1 = {
             name: "pleasing",
             labels: ["Strongly disagree", "-", "-", "-", "-", "-", "Strongly agree"],
         },
-        { prompt: "How expressive would you describe the clip you just watched?", 
-            name: "expressive", 
+        {
+            prompt: "How expressive would you describe the clip you just watched?",
+            name: "expressive",
             labels: ["Not at all", "-", "-", "-", "-", "-", "Extremely"],
         },
-        { prompt: "How emotional would you describe the clip you just watched?", 
-            name: "emotional", 
+        {
+            prompt: "How emotional would you describe the clip you just watched?",
+            name: "emotional",
             labels: ["Not at all", "-", "-", "-", "-", "-", "Extremely"],
         },
-       ],
+    ],
     data: {
         screen: "post_viewing_1",
     },
