@@ -25,14 +25,14 @@ var Experiment_Instructions = {
 
 //Experiment Task 1
 var video_stimuli = [
-    // { stimulus: ["https://github.com/RealityBending/FictionFilm/blob/main/experiment/media/stimuli1.mp4"] },
-    // { stimulus: ["https://github.com/RealityBending/FictionFilm/blob/main/experiment/media/stimuli2.mp4"] },
-    // { stimulus: ["https://github.com/RealityBending/FictionFilm/blob/main/experiment/media/stimuli3.mp4"] },
-    // { stimulus: ["https://github.com/RealityBending/FictionFilm/blob/main/experiment/media/stimuli4.mp4"] },
-    { stimulus: ["media/Stimuli5.mp4"] },
-    { stimulus: ["media/Stimuli6.mp4"] },
-    { stimulus: ["media/Stimuli7.mp4"] },
-    { stimulus: ["media/Stimuli8.mp4"] },
+    { stimulus: ["https://github.com/RealityBending/FictionFilm/blob/main/experiment/media/stimuli1.mp4"] },
+    { stimulus: ["https://github.com/RealityBending/FictionFilm/blob/main/experiment/media/stimuli2.mp4"] },
+    { stimulus: ["https://github.com/RealityBending/FictionFilm/blob/main/experiment/media/stimuli3.mp4"] },
+    { stimulus: ["https://github.com/RealityBending/FictionFilm/blob/main/experiment/media/stimuli4.mp4"] },
+    // { stimulus: ["media/Stimuli5.mp4"] },
+    // { stimulus: ["media/Stimuli6.mp4"] },
+    // { stimulus: ["media/Stimuli7.mp4"] },
+    // { stimulus: ["media/Stimuli8.mp4"] },
     // { stimulus: ["media/Stimuli9.mp4"] },
     // { stimulus: ["media/Stimuli10.mp4"] },
     // { stimulus: ["media/Stimuli11.mp4"] },
