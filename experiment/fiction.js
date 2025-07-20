@@ -25,10 +25,10 @@ var Experiment_Instructions = {
 
 //Experiment Task 1
 var video_stimuli = [
-    { stimulus: ["media/stimuli1.mp4"] },
-    { stimulus: ["media/stimuli2.mp4"] },
-    { stimulus: ["media/stimuli3.mp4"] },
-    { stimulus: ["media/stimuli4.mp4"] },
+    // { stimulus: ["media/stimuli1.mp4"] },
+    // { stimulus: ["media/stimuli2.mp4"] },
+    // { stimulus: ["media/stimuli3.mp4"] },
+    // { stimulus: ["media/stimuli4.mp4"] },
     // { stimulus: ["media/Stimuli5.mp4"] },
     // { stimulus: ["media/Stimuli6.mp4"] },
     // { stimulus: ["media/Stimuli7.mp4"] },
