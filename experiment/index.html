@@ -102,6 +102,9 @@
     timeline.push(Experiment_Instructions_2)
     timeline.push(test_procedure_2)
 
+    timeline.push(experiment_feedback)
+    timeline.push(demographics_debriefing)
+
     // // Save data via DataPipe
     timeline.push({
         type: jsPsychPipe,
@@ -111,8 +114,7 @@
         data_string: () => jsPsych.data.get().csv(),
     })
 
-    timeline.push(experiment_feedback)
-    timeline.push(demographics_debriefing)
+    timeline.push(demographics_endscreen)
 
     /* ----------------- Run the timeline ----------------- */
     jsPsych.run(timeline)

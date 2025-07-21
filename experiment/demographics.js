@@ -250,7 +250,7 @@ var demographic_questions = {
 
 // Media Literacy and AI Expertise ========================================================================================================
 
-var  media = {
+var media = {
     type: jsPsychSurvey,
     survey_json: {
         title: "Your Relationship with Film and Media",
@@ -275,7 +275,7 @@ var  media = {
                         title: "How much do you enjoy watching films?",
                         name: "film_enjoyment",
                         type: "rating",
-                        rateValues:["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
                         isRequired: true,
                         colCount: 0,
                     },
@@ -287,7 +287,7 @@ var  media = {
                         isRequired: true,
                         colCount: 0,
                     },
-                     {
+                    {
                         title: "How confident are you in identifying film messages or themes?",
                         name: "film_identification",
                         type: "rating",
@@ -295,11 +295,11 @@ var  media = {
                         isRequired: true,
                         colCount: 0,
                     },
-                      {
+                    {
                         title: "How confident are you in recognising the emotions a film tries to convey?",
                         name: "film_empathy",
                         type: "rating",
-                        rateValues:["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
                         isRequired: true,
                         colCount: 0,
                     },
@@ -331,7 +331,7 @@ var  media = {
                         isRequired: true,
                     },
                 ],
-            },             
+            },
         ],
     },
     data: {
@@ -373,21 +373,25 @@ var experiment_feedback = {
                         isRequired: false,
                         rateMin: 0,
                         rateMax: 4,
+                        minRateDescription: "No effort at all",
+                        maxRateDescription: "A lot of effort",
                     },
                     {
                         type: "comment",
-                        name: "Feedback_Text",
+                        name: "Feedback_Unusual",
                         title: "Did you notice anything unusual about the clips or the way they were labelled?",
                         isRequired: false,
                     },
                     {
                         type: "rating",
                         name: "AI_perception_change",
-                        title: "Do you feel your attitudes toward AI have changed following this experiment? (0, No; 4, Yes)",
+                        title: "Do you feel your attitudes toward AI have changed following this experiment?",
                         description: "Please be honest!",
                         isRequired: false,
                         rateMin: 0,
                         rateMax: 4,
+                        minRateDescription: "No change at all",
+                        maxRateDescription: "A lot of change",
                     },
                     {
                         type: "comment",
@@ -434,17 +438,17 @@ var demographics_debriefing = {
     data: {
         screen: "demographics_debrief",
     },
-    on_finish: function (data) {
-        let score = check_attentionchecks()
-        if (score >= 0.75) {
-            //  TODO: Change later
-            data["Reward"] = "Automatic"
-            data["AttentionScore"] = score
-        } else {
-            data["Reward"] = "Return"
-            data["AttentionScore"] = score
-        }
-    },
+    // on_finish: function (data) {
+    //     let score = check_attentionchecks()
+    //     if (score >= 0.75) {
+    //         //  TODO: Change later
+    //         data["Reward"] = "Automatic"
+    //         data["AttentionScore"] = score
+    //     } else {
+    //         data["Reward"] = "Return"
+    //         data["AttentionScore"] = score
+    //     }
+    // },
 }
 
 var demographics_endscreen = {
