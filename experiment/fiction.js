@@ -178,7 +178,7 @@ var post_viewing_1 = {
         },
     ],
     data: {
-        screen: "post_viewing_1",
+        screen: "ratings_1",
     },
     randomize_question_order: false,
 }
@@ -227,7 +227,7 @@ var Participant_labelling_task = {
         },
     ],
     data: {
-        screen: "post_viewing_2",
+        screen: "ratings_2",
     },
     randomize_question_order: true,
 }

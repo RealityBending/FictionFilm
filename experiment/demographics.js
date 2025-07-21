@@ -325,7 +325,7 @@ var media = {
                     {
                         visibleIf: "{media_professional} == true",
                         title: "According to the ScreenSkills defined Career Stages, what is your seniority level?",
-                        name: "seniority",
+                        name: "media_seniority",
                         type: "radiogroup",
                         choices: ["Entry", "Early", "Experienced", "Expert"],
                         isRequired: true,
