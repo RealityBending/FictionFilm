@@ -129,7 +129,13 @@ var fiction_cue = {
     },
     trial_duration: 1000,
     choices: ["NO_KEYS"],
-    data: { screen: "fiction_cue" },
+    data: function () {
+        var label = jsPsych.timelineVariable("label")
+        return {
+            screen: "fiction_cue",
+            label: label
+        }
+    },
 }
 
 // Video screen phase 1
@@ -149,42 +155,84 @@ var video_trial_1 = {
 // Post Viewing Questions 1
 
 var post_viewing_1 = {
-    type: jsPsychSurveyLikert,
-    questions: [
-        {
-            prompt: "To what extent do you agree that this clip is enjoyable?",
-            name: "enjoyable",
-            labels: ["Strongly disagree", "-", "-", "-", "-", "-", "Strongly agree"],
-        },
-        {
-            prompt: "To what extent do you agree that this clip is likable?",
-            name: "likeable",
-            labels: ["Strongly disagree", "-", "-", "-", "-", "-", "Strongly agree"],
-        },
-        {
-            prompt: "To what extent do you agree that this clip is pleasing?",
-            name: "pleasing",
-            labels: ["Strongly disagree", "-", "-", "-", "-", "-", "Strongly agree"],
-        },
-        {
-            prompt: "How expressive would you describe the clip you just watched?",
-            name: "expressive",
-            labels: ["Not at all", "-", "-", "-", "-", "-", "Extremely"],
-        },
-        {
-            prompt: "How emotional would you describe the clip you just watched?",
-            name: "emotional",
-            labels: ["Not at all", "-", "-", "-", "-", "-", "Extremely"],
-        },
-    ],
-    data: {
-        screen: "ratings_1",
+    type: jsPsychSurvey,
+    survey_json: {
+        goNextPageAutomatic: true,
+        showQuestionNumbers: false,
+        showNavigationButtons: false,
+        pages: [
+            {
+                elements: [
+                    {
+                        type: "rating",
+                        name: "enjoyable",
+                        title: "To what extent do you agree that this clip is enjoyable?",
+                        isRequired: true,
+                        rateMin: 0,
+                        rateMax: 6,
+                        minRateDescription: "Strongly disagree",
+                        maxRateDescription: "Strongly agree",
+                        displayMode: "buttons"
+                    },
+                    {
+                        type: "rating",
+                        name: "likeable",
+                        title: "To what extent do you agree that this clip is likable?",
+                        isRequired: true,
+                        rateMin: 0,
+                        rateMax: 6,
+                        minRateDescription: "Strongly disagree",
+                        maxRateDescription: "Strongly agree",
+                        displayMode: "buttons"
+                    },
+                    {
+                        type: "rating",
+                        name: "pleasing",
+                        title: "To what extent do you agree that this clip is pleasing?",
+                        isRequired: true,
+                        rateMin: 0,
+                        rateMax: 6,
+                        minRateDescription: "Strongly disagree",
+                        maxRateDescription: "Strongly agree",
+                        displayMode: "buttons"
+                    },
+                    {
+                        type: "rating",
+                        name: "expressive",
+                        title: "How expressive would you describe the clip you just watched?",
+                        isRequired: true,
+                        rateMin: 0,
+                        rateMax: 6,
+                        minRateDescription: "Not at all",
+                        maxRateDescription: "Extremely",
+                        displayMode: "buttons"
+                    },
+                    {
+                        type: "rating",
+                        name: "emotional",
+                        title: "How emotional would you describe the clip you just watched?",
+                        isRequired: true,
+                        rateMin: 0,
+                        rateMax: 6,
+                        minRateDescription: "Not at all",
+                        maxRateDescription: "Extremely",
+                        displayMode: "buttons"
+                    }
+                ]
+            }
+        ]
     },
-    randomize_question_order: false,
+    data: {
+        screen: "fiction_ratings1"
+    }
 }
 
+
 var test_procedure_1 = {
-    timeline: [fiction_cue, video_trial_1, post_viewing_1],
+    timeline: [
+        fiction_cue,
+        video_trial_1,
+        post_viewing_1],
     timeline_variables: video_stimuli,
     randomize_order: false,
 }
@@ -218,22 +266,38 @@ var video_trial_2 = {
 
 // Post Viewing Questions 3
 var Participant_labelling_task = {
-    type: jsPsychSurveyLikert,
-    questions: [
-        {
-            prompt: "Please indicate your confidence that the clip was AI generated or human made:",
-            name: "Confidence in label",
-            labels: ["AI generated", "-", "-", "Not sure", "-", "-", "Human made"],
-        },
-    ],
-    data: {
-        screen: "ratings_2",
+    type: jsPsychSurvey,
+    survey_json: {
+        goNextPageAutomatic: true,
+        showQuestionNumbers: false,
+        showNavigationButtons: false,
+        pages: [
+            {
+                elements: [
+                    {
+                        type: "rating",
+                        name: "Confidence_in_label",
+                        title: "Please indicate your confidence that the clip was AI generated or human made:",
+                        isRequired: true,
+                        rateMin: 0,
+                        rateMax: 6,
+                        minRateDescription: "AI generated",
+                        maxRateDescription: "Human made",
+                        displayMode: "buttons"
+                    }
+                ]
+            }
+        ]
     },
-    randomize_question_order: true,
+    data: {
+        screen: "fiction_ratings2"
+    }
 }
 
 var test_procedure_2 = {
-    timeline: [video_trial_2, Participant_labelling_task],
+    timeline: [
+        video_trial_2,
+        Participant_labelling_task],
     timeline_variables: video_stimuli,
     randomize_order: true,
 }
