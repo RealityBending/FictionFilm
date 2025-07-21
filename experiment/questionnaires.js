@@ -102,6 +102,7 @@ const questionnaire_bait = {
             showQuestionNumbers: false,
             goNextPageAutomatic: true,
             pages: make_bait(bait_items),
+            isRequired: required,
         }
     },
     data: {
