@@ -2,7 +2,7 @@ library(jsonlite)
 library(progress)
 
 # path for data
-path <- "C:/Users/asf25/Box/FictionFilm/"
+path <- "/Users/millyhouldey/Desktop/osf_data/"
 
 # JsPsych Experiment ----------------------------
 
@@ -138,5 +138,13 @@ dftask$Participant <- correspondance[dftask$Participant]
 
 write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
 write.csv(dftask, "../data/rawdata_task.csv", row.names = FALSE)
+
+
+data <- read.csv("~/Desktop/osf_data/x1ba83wplb.csv")
+
+path <- "/Users/myname/Desktop/osf_data/"
+
+
+
 
 
