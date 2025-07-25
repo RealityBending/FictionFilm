@@ -451,6 +451,41 @@ var demographics_debriefing = {
     // },
 }
 
+// Raffle information
+var demographics_raffle = {
+     type: jsPsychSurvey,
+    survey_json: {
+        showQuestionNumbers: false,
+        completeText: "Continue",
+        pages: [
+            {
+                elements: [
+                    {
+                        type: "html",
+                        name: "Raffle_Info",
+                        // title: "Join the Raffle",
+                        html: '<h3>Join the Raffle</h3>' +
+
+                        "<p>If you would like to enter a raffle draw to potentially win a £25 Amazon voucher, please enter your email address below:</p>" +
+                        "<p>Your email will only be used for the purpose of selecting and contacting the raffle winner." +
+                        " We will <b>not use your email for any other purpose</b>, and it will not be linked to your study responses, which remain completely anonymous.",
+                    },
+                    {
+                        type: "text",
+                        name: "Raffle_Email",
+                        title: "Email Address",
+                        isRequired: false,
+                        inputType: "email",
+                        placeholder: "margaret.smith@gmail.com",
+                    }
+                ],
+            },
+        ],
+    },
+    data: {
+        screen: "demographics_raffle",
+    },
+}
 var demographics_endscreen = {
     type: jsPsychSurvey,
     survey_json: function () {

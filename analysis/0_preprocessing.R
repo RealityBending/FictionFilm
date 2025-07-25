@@ -2,7 +2,8 @@ library(jsonlite)
 library(progress)
 
 # path for data
-path <- "/Users/millyhouldey/Desktop/osf_data"
+# path <- "/Users/millyhouldey/Desktop/osf_data"
+path <- "C:/Users/asf25/Box/FictionFilm/"
 
 # JsPsych Experiment ----------------------------
 
@@ -15,23 +16,28 @@ alldata <- data.frame()
 for (file in files){
   progbar$tick()
   rawdata <- read.csv(paste0(path, "/", file))
+
+  # Raffle data
+  raffle_df <- jsonlite::fromJSON(rawdata[rawdata$screen == "demographics_raffle", ]$response) 
+  raffle_data <- data.frame(email = ifelse(is.null(raffle_df$Raffle_Email), NA, raffle_df$Raffle_Email))
   
+    
   # PARTCIPANT DATA ====================================================================================
   
   # Initialize participant-level data
   dat <- rawdata[rawdata$screen == "browser_info", ]
   
-  data_ppt <- data.frame(
-    Participant = dat$participantID,
-    Recruitment = dat$researcher,
-    Experiment_StartDate = as.POSIXct(paste(dat$date, dat$time), format = "%d/%m/%Y %H:%M:%S"),
-    Experiment_Duration = rawdata[rawdata$screen == "demographics_debrief", "time_elapsed"] / 1000 / 60,
-    Browser_Version = paste(dat$browser, dat$browser_version),
-    Mobile = dat$mobile,
-    Platform = dat$os,
-    Screen_Width = dat$screen_width,
-    Screen_Height = dat$screen_height
-  )
+    data_ppt <- data.frame(
+      Participant = dat$participantID,
+      Recruitment = dat$researcher,
+      Experiment_StartDate = as.POSIXct(paste(dat$date, dat$time), format = "%d/%m/%Y %H:%M:%S"),
+      Experiment_Duration = rawdata[rawdata$screen == "demographics_debrief", "time_elapsed"] / 1000 / 60,
+      Browser_Version = paste(dat$browser, dat$browser_version),
+      Mobile = dat$mobile,
+      Platform = dat$os,
+      Screen_Width = dat$screen_width,
+      Screen_Height = dat$screen_height
+    )
   
   # Demographics
   demog <- jsonlite::fromJSON(rawdata[rawdata$screen == "demographic_questions", ]$response)
@@ -92,7 +98,7 @@ for (file in files){
   ratings1 = rawdata[rawdata$screen == "fiction_ratings1", ]
   cues <- rawdata[rawdata$screen == "fiction_cue",]
 
-  dftask <- data.frame(
+  data_task <- data.frame(
     Participant = dat$participantID,
     Stimulus = gsub("\\.mp4|\\\"|\\[|\\]|media/", "", stims1$stimulus),
     Rating_RT_Phase1 = ratings1$rt,
@@ -100,11 +106,11 @@ for (file in files){
   )
   
   ratings1 <- lapply(ratings1$response, fromJSON)
-  dftask$Enjoyable <- sapply(ratings1, function(x) x$enjoyable)
-  dftask$Likeable <- sapply(ratings1, function(x) x$likeable)
-  dftask$Pleasing <- sapply(ratings1, function(x) x$pleasing)
-  dftask$Expressive <- sapply(ratings1, function(x) x$expressive)
-  dftask$Emotional <- sapply(ratings1, function(x) x$emotional)
+  data_task$Enjoyable <- sapply(ratings1, function(x) x$enjoyable)
+  data_task$Likeable <- sapply(ratings1, function(x) x$likeable)
+  data_task$Pleasing <- sapply(ratings1, function(x) x$pleasing)
+  data_task$Expressive <- sapply(ratings1, function(x) x$expressive)
+  data_task$Emotional <- sapply(ratings1, function(x) x$emotional)
   
   # phase 2 
   stims2 <- rawdata[rawdata$screen == "video_phase_2",]
@@ -120,9 +126,9 @@ for (file in files){
   dftask2$Confidence_label <- sapply(ratings2, function(x) x$Confidence_in_label)
 
   # Merge and clean
-  data_task <- merge(dftask, dftask2, by = c("Participant", "Stimulus"), all.x = TRUE)
-  
-}
+  data_task <- merge(data_task, dftask2, by = c("Participant", "Stimulus"), all.x = TRUE)
+
+  }
 
 # Reanonimize ============================================================
 
@@ -138,9 +144,9 @@ dftask$Participant <- correspondance[dftask$Participant]
 
 write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
 write.csv(data_task, "../data/rawdata_task.csv", row.names = FALSE)
+write.csv(raffle_data, "../raffle.csv", row.names = FALSE)
 
 
-data <- read.csv("~/Desktop/osf_data/x1ba83wplb.csv")
 
 
 
