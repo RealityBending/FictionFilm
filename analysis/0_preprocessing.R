@@ -2,7 +2,7 @@ library(jsonlite)
 library(progress)
 
 # path for data
-path <- "/Users/millyhouldey/Desktop/osf_data/"
+path <- "/Users/millyhouldey/Desktop/osf_data"
 
 # JsPsych Experiment ----------------------------
 
@@ -120,7 +120,7 @@ for (file in files){
   dftask2$Confidence_label <- sapply(ratings2, function(x) x$Confidence_in_label)
 
   # Merge and clean
-  dftask <- merge(dftask, dftask2, by = c("Participant", "Stimulus"), all.x = TRUE)
+  data_task <- merge(dftask, dftask2, by = c("Participant", "Stimulus"), all.x = TRUE)
   
 }
 
@@ -137,12 +137,12 @@ dftask$Participant <- correspondance[dftask$Participant]
 # Save --------------------------------------------------------------------
 
 write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
-write.csv(dftask, "../data/rawdata_task.csv", row.names = FALSE)
+write.csv(data_task, "../data/rawdata_task.csv", row.names = FALSE)
 
 
 data <- read.csv("~/Desktop/osf_data/x1ba83wplb.csv")
 
-path <- "/Users/myname/Desktop/osf_data/"
+
 
 
 
