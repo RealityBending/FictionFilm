@@ -16,11 +16,6 @@ alldata <- data.frame()
 for (file in files){
   progbar$tick()
   rawdata <- read.csv(paste0(path, "/", file))
-
-  # Raffle data
-  raffle_df <- jsonlite::fromJSON(rawdata[rawdata$screen == "demographics_raffle", ]$response) 
-  raffle_data <- data.frame(email = ifelse(is.null(raffle_df$Raffle_Email), NA, raffle_df$Raffle_Email))
-  
     
   # PARTCIPANT DATA ====================================================================================
   
@@ -144,7 +139,6 @@ dftask$Participant <- correspondance[dftask$Participant]
 
 write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
 write.csv(data_task, "../data/rawdata_task.csv", row.names = FALSE)
-write.csv(raffle_data, "../raffle.csv", row.names = FALSE)
 
 
 
