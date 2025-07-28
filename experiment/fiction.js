@@ -100,13 +100,12 @@ var fiction_preload = {
     video: video_stimuli.map((item) => item.stimulus).flat(),
 }
 
-// Assign half stimuli to each label
+// Assign Condition property to half Human-made, half AI-generated
 for (let i = 0; i < video_stimuli.length; i++) {
-    video_stimuli[i].label =
-        i < video_stimuli.length / 2 ? "Human-made" : "AI-generated"
+    video_stimuli[i].Condition = i < video_stimuli.length / 2 ? "Human" : "AI"
 }
 
-// Reshuffle after assigning labels
+// Shuffle stimuli (optional)
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
@@ -114,27 +113,35 @@ function shuffleArray(array) {
     }
     return array
 }
+video_stimuli = shuffleArray(video_stimuli)
 
-var video_stimuli = shuffleArray(video_stimuli)
+// Map Condition to display text
+var text_cue = {
+    AI: "AI-Generated",
+    Human: "Human-made",
+}
 
-// Label screen
+// Preload videos
+var fiction_preload = {
+    type: jsPsychPreload,
+    video: video_stimuli.map((item) => item.stimulus).flat(),
+}
+
+// Fiction cue trial displaying the condition label
 var fiction_cue = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: function () {
-        return (
-            "<div style='font-size:450%; position:fixed; text-align: center; top:50%; bottom:50%; right:20%; left:20%" +
-            "'><b>" +
-            jsPsych.timelineVariable("label") +
-            "</b></div>"
-        )
+        let cond = jsPsych.evaluateTimelineVariable("Condition")
+        return `<div style='font-size:450%; position:fixed; text-align:center; top:50%; bottom:50%; right:20%; left:20%;'>
+            <b>${text_cue[cond]}</b>
+            </div>`
     },
     trial_duration: 1000,
-    choices: ["NO_KEYS"],
+    choices: "NO_KEYS",
     data: function () {
-        var label = jsPsych.timelineVariable("label")
         return {
             screen: "fiction_cue",
-            label: label,
+            condition: jsPsych.evaluateTimelineVariable("Condition"),
         }
     },
 }
