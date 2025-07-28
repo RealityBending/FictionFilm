@@ -174,7 +174,8 @@ var demographic_questions = {
                         colCount: 1,
                     },
                     {
-                        visibleIf: "{Education} == 'Doctorate' || {Education} == 'Master' || {Education} == 'Bachelor'",
+                        visibleIf:
+                            "{Education} == 'Doctorate' || {Education} == 'Master' || {Education} == 'Bachelor'",
                         title: "What is your discipline?",
                         name: "Discipline",
                         type: "radiogroup",
@@ -197,7 +198,8 @@ var demographic_questions = {
                         otherPlaceholder: "Please specify",
                     },
                     {
-                        visibleIf: "{Education} == 'High school' || {Education} == 'Master' || {Education} == 'Bachelor'",
+                        visibleIf:
+                            "{Education} == 'High school' || {Education} == 'Master' || {Education} == 'Bachelor'",
                         title: "Are you currently a student?",
                         name: "Student",
                         type: "boolean",
@@ -254,7 +256,8 @@ var media = {
     type: jsPsychSurvey,
     survey_json: {
         title: "Your Relationship with Film and Media",
-        description: "Due to the nature of this study, we are interested in your overall consumption, knowledge and expertise on media (TV, Film etc.). Please read the statements carefully and indicate the extent to which you agree with each statement.",
+        description:
+            "Due to the nature of this study, we are interested in your overall consumption, knowledge and expertise on media (TV, Film etc.). Please read the statements carefully and indicate the extent to which you agree with each statement.",
         completeText: "Continue",
         pageNextText: "Next",
         pagePrevText: "Previous",
@@ -267,7 +270,13 @@ var media = {
                         title: "How much would you say watching films is part of your routine?",
                         name: "film_routine",
                         type: "rating",
-                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        rateValues: [
+                            "Not at all",
+                            "A little",
+                            "Somewhat",
+                            "Very",
+                            "Extremely",
+                        ],
                         isRequired: true,
                         colCount: 0,
                     },
@@ -275,7 +284,13 @@ var media = {
                         title: "How much do you enjoy watching films?",
                         name: "film_enjoyment",
                         type: "rating",
-                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        rateValues: [
+                            "Not at all",
+                            "A little",
+                            "Somewhat",
+                            "Very",
+                            "Extremely",
+                        ],
                         isRequired: true,
                         colCount: 0,
                     },
@@ -283,7 +298,13 @@ var media = {
                         title: "How confident are you in evaluating the quality of a film?",
                         name: "film_quality",
                         type: "rating",
-                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        rateValues: [
+                            "Not at all",
+                            "A little",
+                            "Somewhat",
+                            "Very",
+                            "Extremely",
+                        ],
                         isRequired: true,
                         colCount: 0,
                     },
@@ -291,7 +312,13 @@ var media = {
                         title: "How confident are you in identifying film messages or themes?",
                         name: "film_identification",
                         type: "rating",
-                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        rateValues: [
+                            "Not at all",
+                            "A little",
+                            "Somewhat",
+                            "Very",
+                            "Extremely",
+                        ],
                         isRequired: true,
                         colCount: 0,
                     },
@@ -299,7 +326,13 @@ var media = {
                         title: "How confident are you in recognising the emotions a film tries to convey?",
                         name: "film_empathy",
                         type: "rating",
-                        rateValues: ["Not at all", "A little", "Somewhat", "Very", "Extremely"],
+                        rateValues: [
+                            "Not at all",
+                            "A little",
+                            "Somewhat",
+                            "Very",
+                            "Extremely",
+                        ],
                         isRequired: true,
                         colCount: 0,
                     },
@@ -312,7 +345,6 @@ var media = {
                         name: "media_professional",
                         type: "boolean",
                         isRequired: true,
-
                     },
                     {
                         visibleIf: "{media_professional} == true",
@@ -339,13 +371,13 @@ var media = {
     },
 }
 
-
 // Feedback, Debrief, Thank you Screen
 var experiment_feedback = {
     type: jsPsychSurvey,
     survey_json: {
         title: "Feedback",
-        description: "It is the end of the experiment! Don't hesitate to leave us a feedback.",
+        description:
+            "It is the end of the experiment! Don't hesitate to leave us a feedback.",
         completeText: "Complete the experiment",
         showQuestionNumbers: false,
         pages: [
@@ -453,7 +485,7 @@ var demographics_debriefing = {
 
 // Raffle information
 var demographics_raffle = {
-     type: jsPsychSurvey,
+    type: jsPsychSurvey,
     survey_json: {
         showQuestionNumbers: false,
         completeText: "Continue",
@@ -464,11 +496,11 @@ var demographics_raffle = {
                         type: "html",
                         name: "Raffle_Info",
                         // title: "Join the Raffle",
-                        html: '<h3>Join the Raffle</h3>' +
-
-                        "<p>If you would like to enter a raffle draw to potentially win a £25 Amazon voucher, please enter your email address below:</p>" +
-                        "<p>Your email will only be used for the purpose of selecting and contacting the raffle winner." +
-                        " We will <b>not use your email for any other purpose</b>, and it will not be linked to your study responses, which remain completely anonymous.",
+                        html:
+                            "<h3>Join the Raffle</h3>" +
+                            "<p>If you would like to enter a raffle draw to potentially win a £25 Amazon voucher, please enter your email address below:</p>" +
+                            "<p>Your email will only be used for the purpose of selecting and contacting the raffle winner." +
+                            " We will <b>not use your email for any other purpose</b>, and it will not be linked to your study responses, which remain completely anonymous.",
                     },
                     {
                         type: "text",
@@ -477,7 +509,7 @@ var demographics_raffle = {
                         isRequired: false,
                         inputType: "email",
                         placeholder: "margaret.smith@gmail.com",
-                    }
+                    },
                 ],
             },
         ],
@@ -489,7 +521,9 @@ var demographics_raffle = {
 var demographics_endscreen = {
     type: jsPsychSurvey,
     survey_json: function () {
-        text = "<h2 style='color:green;'>Data saved successfully!</h2>" + "<p>Thank you for participating, it means a lot to us.</p>"
+        text =
+            "<h2 style='color:green;'>Data saved successfully!</h2>" +
+            "<p>Thank you for participating, it means a lot to us.</p>"
 
         // Snowball (uncomment if the study is really fun)
         // text +=
@@ -505,7 +539,9 @@ var demographics_endscreen = {
 
         // Deal with Prolific/SurveyCircle/SurveySwap/SONA
         if (jsPsych.data.urlVariables()["exp"] == "prolific") {
-            d = jsPsych.data.get().filter({ screen: "demographics_debrief" })["trials"][0]
+            d = jsPsych.data.get().filter({ screen: "demographics_debrief" })[
+                "trials"
+            ][0]
             if (d["Reward"] == "Automatic") {
                 text +=
                     "<p><b style='color:red;'>After clicking 'End', you will be redirected to the Prolific reimbursement page</b> (You can alternatively click " +

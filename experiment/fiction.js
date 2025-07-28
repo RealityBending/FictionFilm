@@ -102,14 +102,15 @@ var fiction_preload = {
 
 // Assign half stimuli to each label
 for (let i = 0; i < video_stimuli.length; i++) {
-    video_stimuli[i].label = i < video_stimuli.length / 2 ? "Human-made" : "AI-generated"
+    video_stimuli[i].label =
+        i < video_stimuli.length / 2 ? "Human-made" : "AI-generated"
 }
 
 // Reshuffle after assigning labels
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
-            ;[array[i], array[j]] = [array[j], array[i]]
+        ;[array[i], array[j]] = [array[j], array[i]]
     }
     return array
 }
@@ -133,7 +134,7 @@ var fiction_cue = {
         var label = jsPsych.timelineVariable("label")
         return {
             screen: "fiction_cue",
-            label: label
+            label: label,
         }
     },
 }
@@ -172,7 +173,7 @@ var post_viewing_1 = {
                         rateMax: 6,
                         minRateDescription: "Strongly disagree",
                         maxRateDescription: "Strongly agree",
-                        displayMode: "buttons"
+                        displayMode: "buttons",
                     },
                     {
                         type: "rating",
@@ -183,7 +184,7 @@ var post_viewing_1 = {
                         rateMax: 6,
                         minRateDescription: "Strongly disagree",
                         maxRateDescription: "Strongly agree",
-                        displayMode: "buttons"
+                        displayMode: "buttons",
                     },
                     {
                         type: "rating",
@@ -194,7 +195,7 @@ var post_viewing_1 = {
                         rateMax: 6,
                         minRateDescription: "Strongly disagree",
                         maxRateDescription: "Strongly agree",
-                        displayMode: "buttons"
+                        displayMode: "buttons",
                     },
                     {
                         type: "rating",
@@ -205,7 +206,7 @@ var post_viewing_1 = {
                         rateMax: 6,
                         minRateDescription: "Not at all",
                         maxRateDescription: "Extremely",
-                        displayMode: "buttons"
+                        displayMode: "buttons",
                     },
                     {
                         type: "rating",
@@ -216,23 +217,19 @@ var post_viewing_1 = {
                         rateMax: 6,
                         minRateDescription: "Not at all",
                         maxRateDescription: "Extremely",
-                        displayMode: "buttons"
-                    }
-                ]
-            }
-        ]
+                        displayMode: "buttons",
+                    },
+                ],
+            },
+        ],
     },
     data: {
-        screen: "fiction_ratings1"
-    }
+        screen: "fiction_ratings1",
+    },
 }
 
-
 var test_procedure_1 = {
-    timeline: [
-        fiction_cue,
-        video_trial_1,
-        post_viewing_1],
+    timeline: [fiction_cue, video_trial_1, post_viewing_1],
     timeline_variables: video_stimuli,
     randomize_order: false,
 }
@@ -283,21 +280,19 @@ var Participant_labelling_task = {
                         rateMax: 6,
                         minRateDescription: "AI generated",
                         maxRateDescription: "Human made",
-                        displayMode: "buttons"
-                    }
-                ]
-            }
-        ]
+                        displayMode: "buttons",
+                    },
+                ],
+            },
+        ],
     },
     data: {
-        screen: "fiction_ratings2"
-    }
+        screen: "fiction_ratings2",
+    },
 }
 
 var test_procedure_2 = {
-    timeline: [
-        video_trial_2,
-        Participant_labelling_task],
+    timeline: [video_trial_2, Participant_labelling_task],
     timeline_variables: video_stimuli,
     randomize_order: true,
 }
