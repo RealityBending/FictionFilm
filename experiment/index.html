@@ -1,124 +1,119 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <!--create title shown in tab; not the same as header on webpage-->
+        <title>Cinema Study</title>
+        <!-- Load JsPsych -->
+        <script src="https://unpkg.com/jspsych@8.2.2"></script>
+        <link href="https://unpkg.com/jspsych@8.2.2/css/jspsych.css" rel="stylesheet" type="text/css"/></script>
 
-<head>
-    <!--create title shown in tab; not the same as header on webpage-->
-    <title>Cinema Study</title>
-    <!--load the jsPsych library; set src to own path-->
-    <script src="https://unpkg.com/jspsych@7.3.1"></script>
-    <link href="https://unpkg.com/jspsych@7.3.1/css/jspsych.css" rel="stylesheet" type="text/css" />
+        <!--Load all necessary plugins-->
+        <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-button-response@2.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-fullscreen@2.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-preload@2.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-browser-check@2.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.3"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-video-keyboard-response@2.1.0"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-html-video-response@2.1.0"></script>
 
-    <!--Load all necessary plugins-->
-    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-html-button-response"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-fullscreen"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-survey-text"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-preload"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-video-keyboard-response"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-browser-check"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.3"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-video-button-response"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-image-button-response"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-external-html"></script>
-    <script src="https://unpkg.com/@jspsych/plugin-survey@1.0.1"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@1.0.1/css/survey.css" />
 
-    <!--Load Stimuli and custom plugins-->
-    <script src="https://realitybending.github.io/JSmisc/misc/utils.js"></script>
-    <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.4.0"></script>
-    <script src="demographics.js"></script>
-    <script src="fiction.js"></script>
-    <script src="questionnaires.js"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-survey@3.0.0"></script>
+        <link rel="stylesheet" href="https://unpkg.com/@jspsych/plugin-survey@3.0.0/css/survey.css" />
 
-    <style>
-        #jspsych-image-keyboard-response-stimulus {
-            /*adjust image stimuli params to fit screen*/
-            height: auto;
-            width: 55%;
-        }
+        <!--Load Stimuli and custom plugins-->
+        <script src="https://realitybending.github.io/JSmisc/misc/utils.js"></script>
+        <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe@0.4.0"></script>
+        <script src="demographics.js"></script>
+        <script src="fiction.js"></script>
+        <script src="questionnaires.js"></script>
 
-        body {
-            /*Hide scrollbar while keeping it functional */
-            overflow-y: scroll;
-            overflow-x: flow;
-        }
+        <style>
+            #jspsych-image-keyboard-response-stimulus {
+                /*adjust image stimuli params to fit screen*/
+                height: auto;
+                width: 55%;
+            }
 
-        Body::-webkit-scrollbar {
-            display: none;
-        }
+            body {
+                /*Hide scrollbar while keeping it functional */
+                overflow-y: scroll;
+                overflow-x: flow;
+            }
 
-        /* set canvas to be full screen */
-        .jspsych-content {
-            max-width: 100%;
-        }
-    </style>
-</head>
+            Body::-webkit-scrollbar {
+                display: none;
+            }
 
-<body></body>
+            /* set canvas to be full screen */
+            .jspsych-content {
+                max-width: 100%;
+            }
+        </style>
+    </head>
 
-<script>
-    // OSF link and data pipe create projects and link
-    /* Initialize jsPsych ================================================================*/
-    var jsPsych = initJsPsych({
-        show_progress_bar: true,
-        message_progress_bar: "Completion",
-        on_finish: function () {
-            // jsPsych.data.displayData("json")
-            // jsPsych.data
-            // .get()
-            // .localSave(
-            // "json",
-            // `${jsPsych.data.get().values()[0]["participant_id"]
-            // }_FF.json`
-            // )
-            // window.location = ""
-        },
-    })
+    <body></body>
 
-    var timeline = []
-    participantID = jsPsych.randomization.randomID(10)
+    <script>
+        // OSF link and data pipe create projects and link
+        /* Initialize jsPsych ================================================================*/
+        var jsPsych = initJsPsych({
+            show_progress_bar: true,
+            message_progress_bar: "Completion",
+            on_finish: function () {
+                // jsPsych.data.displayData("json")
+                // jsPsych.data
+                // .get()
+                // .localSave(
+                // "json",
+                // `${jsPsych.data.get().values()[0]["participant_id"]
+                // }_FF.json`
+                // )
+                // window.location = ""
+            },
+        })
 
-    /* Initialize Experiment =============================================================*/
-    // Fullscreen Mode
-    // timeline.push({
-    //     type: jsPsychFullscreen,
-    //     fullscreen_mode: true,
-    // })
+        var timeline = []
+        participantID = jsPsych.randomization.randomID(10)
 
-    timeline.push(demographics_browser_info)
-    timeline.push(ConsentForm)
-    timeline.push(demographic_questions)
-    timeline.push(media)
-    timeline.push(bait)
+        /* Initialize Experiment =============================================================*/
+        // Fullscreen Mode
+        // timeline.push({
+        //     type: jsPsychFullscreen,
+        //     fullscreen_mode: true,
+        // })
 
-    // Experiment Part 1
-    timeline.push(fiction_preload)
-    timeline.push(Experiment_Instructions)
-    timeline.push(test_procedure_1)
+        timeline.push(demographics_browser_info)
+        timeline.push(ConsentForm)
+        timeline.push(demographic_questions)
+        timeline.push(media)
+        timeline.push(bait)
 
-    // Experiment Part 2
-    timeline.push(Experiment_Instructions_2)
-    timeline.push(test_procedure_2)
+        // Experiment Part 1
+        timeline.push(fiction_preload)
+        timeline.push(Experiment_Instructions)
+        timeline.push(test_procedure_1)
 
-    timeline.push(experiment_feedback)
-    timeline.push(demographics_debriefing)
-    timeline.push(demographics_raffle)
-    
-    // // Save data via DataPipe
-    timeline.push({
-        type: jsPsychPipe,
-        action: "save",
-        experiment_id: "ICV4Etaleueb", // This in generated in the DataPipe interface
-        filename: `${participantID}.csv`,
-        data_string: () => jsPsych.data.get().csv(),
-    })
+        // Experiment Part 2
+        timeline.push(Experiment_Instructions_2)
+        timeline.push(test_procedure_2)
 
-    timeline.push(demographics_endscreen)
+        timeline.push(experiment_feedback)
+        timeline.push(demographics_debriefing)
+        timeline.push(demographics_raffle)
 
-    /* ----------------- Run the timeline ----------------- */
-    jsPsych.run(timeline)
-</script>
+        // // Save data via DataPipe
+        timeline.push({
+            type: jsPsychPipe,
+            action: "save",
+            experiment_id: "ICV4Etaleueb", // This in generated in the DataPipe interface
+            filename: `${participantID}.csv`,
+            data_string: () => jsPsych.data.get().csv(),
+        })
 
+        timeline.push(demographics_endscreen)
+
+        /* ----------------- Run the timeline ----------------- */
+        jsPsych.run(timeline)
+    </script>
 </html>
