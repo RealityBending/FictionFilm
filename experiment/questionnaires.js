@@ -60,7 +60,7 @@ const bait_items = {
         "I can show that I am Human and not an AI by answering all the way to the right",
 }
 
-function make_bait(items, required = false, ticks = ["Disagree", "Agree"]) {
+function make_bait(items, required = true, ticks = ["Disagree", "Agree"]) {
     items = shuffleObject(items)
 
     // AI Expertise
