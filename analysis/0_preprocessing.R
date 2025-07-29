@@ -2,8 +2,8 @@ library(jsonlite)
 library(progress)
 
 # path for data
-# path <- "/Users/millyhouldey/Desktop/osf_data"
-path <- "C:/Users/asf25/Box/FictionFilm/data/"
+path <- "/Users/millyhouldey/Desktop/osf_data"
+# path <- "C:/Users/asf25/Box/FictionFilm/data/"
 
 # JsPsych Experiment ----------------------------
 
@@ -14,6 +14,7 @@ progbar <- progress_bar$new(total = length(files))
 
 alldata <- data.frame()
 for (file in files){
+  file = "awas28ndyn.csv"
   progbar$tick()
   rawdata <- read.csv(paste0(path, "/", file))
   
@@ -101,7 +102,7 @@ for (file in files){
     Participant = dat$participantID,
     Stimulus = gsub("\\.mp4|\\\"|\\[|\\]|media/", "", stims1$stimulus),
     Rating_RT_Phase1 = ratings1$rt,
-    Condition = cues$label
+    Condition = cues$condition
   )
   
   ratings1 <- lapply(ratings1$response, fromJSON)
@@ -127,7 +128,7 @@ for (file in files){
   # Merge and clean
   data_task <- merge(data_task, dftask2, by = c("Participant", "Stimulus"), all.x = TRUE)
 
-  }
+}
 
 # Reanonimize ============================================================
 
@@ -137,7 +138,7 @@ data_ppt <- data_ppt[order(data_ppt$Experiment_StartDate), ]
 correspondance <- setNames(paste0("S", sprintf("%03d", seq_along(data_ppt$Participant))), data_ppt$Participant)
 # Reanonymize both datasets by updating the 'Participant' column
 data_ppt$Participant <- correspondance[data_ppt$Participant]
-dftask$Participant <- correspondance[dftask$Participant]
+data_task$Participant <- correspondance[data_task$Participant]
 
 # Save --------------------------------------------------------------------
 
@@ -145,10 +146,12 @@ write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
 write.csv(data_task, "../data/rawdata_task.csv", row.names = FALSE)
 
 # Change path to box folder of fiction film
-write.csv(raffle_data, "C:/Users/millyhouldey/Desktop/Raffle", row.names = FALSE)
+write.csv(raffle_data, "C:/Users/millyhouldey/Desktop/Raffle/raffle_data.csv", row.names = FALSE)
+# write.csv(raffle_data, "C:/Users/asf25/Box/FictionFilm/raffle/raffle_data.csv", row.names = FALSE)
 
 
-rawdata
+
+
 
 
 
