@@ -2,8 +2,8 @@ library(jsonlite)
 library(progress)
 
 # path for data
-path <- "/Users/millyhouldey/Desktop/osf_data"
-# path <- "C:/Users/asf25/Box/FictionFilm/data/"
+# path <- "/Users/millyhouldey/Desktop/osf_data"
+path <- "C:/Users/asf25/Box/FictionFilm/data/"
 
 # JsPsych Experiment ----------------------------
 
@@ -72,10 +72,9 @@ for (file in files){
   # Bait
   bait <- jsonlite::fromJSON(rawdata[rawdata$screen == "questionnaire_bait", "response"])
   
-  # delete later, this was to deal with no responses on the BAIT --? it is now required to answer the questionnaire 
   for (i in seq_along(bait)) {
     if (is.null(bait[[i]])) {
-      bait[[i]] <- 0
+      bait[[i]] <- NA
     }
   }
   
