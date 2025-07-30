@@ -64,7 +64,7 @@ function make_bait(items, required = true, ticks = ["Disagree", "Agree"]) {
     items = shuffleObject(items)
 
     // AI Expertise
-    var aiexpertise = [
+    var ai_questions = [
         {
             title: "How knowledgeable do you consider yourself about Artificial Intelligence (AI) technology?",
             name: "BAIT_AI_Knowledge",
@@ -74,6 +74,22 @@ function make_bait(items, required = true, ticks = ["Disagree", "Agree"]) {
             minRateDescription: "Not at all",
             maxRateDescription: "Expert",
             rateValues: [0, 1, 2, 3, 4, 5, 6],
+        },
+        {
+            title: "How frequently do you use Artificial Intelligence (AI) tools or technologies in your daily life? ",
+            description:
+                "This includes tools like ChatGPT, image or art generators, and AI assistants.",
+            name: "BAIT_AI_Use",
+            type: "radiogroup",
+            // displayMode: "buttons",
+            isRequired: required,
+            choices: [
+                "Never",
+                "A few times a month",
+                "A few times per week",
+                "Once a day",
+                "A few times daily",
+            ],
         },
     ]
 
@@ -96,7 +112,7 @@ function make_bait(items, required = true, ticks = ["Disagree", "Agree"]) {
     }
 
     return [
-        { elements: aiexpertise },
+        { elements: ai_questions },
         {
             elements: questions,
             description:
