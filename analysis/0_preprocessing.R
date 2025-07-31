@@ -14,9 +14,10 @@ progbar <- progress_bar$new(total = length(files))
 
 alldata <- data.frame()
 for (file in files){
-  file = "awas28ndyn.csv"
+  # file <- "ae2ql15ozr.csv"
   progbar$tick()
   rawdata <- read.csv(paste0(path, "/", file))
+  message(paste("\nProcessing:", file))
   
   # Raffle data
   raffle_df <- jsonlite::fromJSON(rawdata[rawdata$screen == "demographics_raffle", ]$response) 
@@ -48,6 +49,11 @@ for (file in files){
 
   # Education
   demog$Education <- ifelse(demog$Education == "other", demog$`Education-Comment`, demog$Education)
+  demog$`Education-Comment` <- NULL
+  
+  # Discipline
+  demog$Discipline <- ifelse(!is.null(demog$Discipline), demog$Discipline, NA)
+  demog$Discipline <-  ifelse(demog$Discipline == "other", demog$`Discipline-Comment`, demog$Discipline)
   demog$`Discipline-Comment` <- NULL
 
   # Ethnicity
@@ -141,12 +147,12 @@ data_task$Participant <- correspondance[data_task$Participant]
 
 # Save --------------------------------------------------------------------
 
-write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
-write.csv(data_task, "../data/rawdata_task.csv", row.names = FALSE)
-
-# Change path to box folder of fiction film
-write.csv(raffle_data, "C:/Users/millyhouldey/Desktop/Raffle/raffle_data.csv", row.names = FALSE)
-# write.csv(raffle_data, "C:/Users/asf25/Box/FictionFilm/raffle/raffle_data.csv", row.names = FALSE)
+# write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
+# write.csv(data_task, "../data/rawdata_task.csv", row.names = FALSE)
+# 
+# # Change path to box folder of fiction film
+# write.csv(raffle_data, "C:/Users/millyhouldey/Desktop/Raffle/raffle_data.csv", row.names = FALSE)
+# # write.csv(raffle_data, "C:/Users/asf25/Box/FictionFilm/raffle/raffle_data.csv", row.names = FALSE)
 
 
 
