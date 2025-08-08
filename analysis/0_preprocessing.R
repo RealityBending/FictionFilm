@@ -14,7 +14,7 @@ progbar <- progress_bar$new(total = length(files))
 
 alldata <- data.frame()
 for (file in files){
-  # file <- "ae2ql15ozr.csv"
+  # file <- "hyb47wjvbs.csv"
   progbar$tick()
   rawdata <- read.csv(paste0(path, "/", file))
   message(paste("\nProcessing:", file))
@@ -51,11 +51,20 @@ for (file in files){
   demog$Education <- ifelse(demog$Education == "other", demog$`Education-Comment`, demog$Education)
   demog$`Education-Comment` <- NULL
   
+  demog$Student <- ifelse(!is.null(demog$Student), demog$Student, NA)
+  demog$Student <-  ifelse(demog$Student == "other", demog$`Student-Comment`, demog$Student)
+  demog$`Student-Comment` <- NULL
+  
   # Discipline
   demog$Discipline <- ifelse(!is.null(demog$Discipline), demog$Discipline, NA)
   demog$Discipline <-  ifelse(demog$Discipline == "other", demog$`Discipline-Comment`, demog$Discipline)
   demog$`Discipline-Comment` <- NULL
 
+  # Country
+  demog$Country <- ifelse(!is.null(demog$Country), demog$Country, NA)
+  demog$Country <-  ifelse(demog$Country == "other", demog$`Country-Comment`, demog$Country)
+  demog$`Country-Comment` <- NULL
+  
   # Ethnicity
   demog$Ethnicity <- ifelse(!is.null(demog$Ethnicity), demog$Ethnicity, NA)
   demog$Ethnicity <- ifelse(demog$Ethnicity == "other", demog$`Ethnicity-Comment`, demog$Ethnicity)
@@ -147,12 +156,12 @@ data_task$Participant <- correspondance[data_task$Participant]
 
 # Save --------------------------------------------------------------------
 
-# write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
-# write.csv(data_task, "../data/rawdata_task.csv", row.names = FALSE)
+write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
+write.csv(data_task, "../data/rawdata_task.csv", row.names = FALSE)
 # 
 # # Change path to box folder of fiction film
 # write.csv(raffle_data, "C:/Users/millyhouldey/Desktop/Raffle/raffle_data.csv", row.names = FALSE)
-# # write.csv(raffle_data, "C:/Users/asf25/Box/FictionFilm/raffle/raffle_data.csv", row.names = FALSE)
+write.csv(raffle_data, "C:/Users/asf25/Box/FictionFilm/raffle/raffle_data.csv", row.names = FALSE)
 
 
 
