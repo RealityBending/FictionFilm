@@ -12,9 +12,12 @@ files <- list.files(path, pattern = "*.csv")
 # Progress bar
 progbar <- progress_bar$new(total = length(files))
 
-alldata <- data.frame()
+all_ppt <- data.frame()
+all_task <- data.frame()
+all_bait_names <- c()
+
 for (file in files){
-  # file <- "hyb47wjvbs.csv"
+  # file <- "7n8xj9q70y.csv"
   progbar$tick()
   rawdata <- read.csv(paste0(path, "/", file))
   message(paste("\nProcessing:", file))
@@ -87,6 +90,8 @@ for (file in files){
   # Bait
   bait <- jsonlite::fromJSON(rawdata[rawdata$screen == "questionnaire_bait", "response"])
   
+  all_bait_names <- union(all_bait_names, names(bait))
+  
   for (i in seq_along(bait)) {
     if (is.null(bait[[i]])) {
       bait[[i]] <- NA
@@ -94,6 +99,11 @@ for (file in files){
   }
   
   bait <- as.data.frame(bait)
+  
+  #Add any missing columns and fill with NA
+  missing_cols <- setdiff(all_bait_names, names(bait))
+  bait[missing_cols] <- NA
+  
 
   data_ppt <- cbind(data_ppt, bait)
   
@@ -104,6 +114,7 @@ for (file in files){
   media <- as.data.frame(media)
   
   data_ppt <- cbind(data_ppt, media)
+  all_ppt <- rbind(all_ppt, data_ppt)
   
   # TASK DATA ====================================================================================
 
@@ -140,28 +151,29 @@ for (file in files){
   dftask2$Confidence_label <- sapply(ratings2, function(x) x$Confidence_in_label)
 
   # Merge and clean
-  data_task <- merge(data_task, dftask2, by = c("Participant", "Stimulus"), all.x = TRUE)
+  data_task <- cbind(data_task, dftask2, by = c("Participant", "Stimulus"), all.x = TRUE)
+  all_task <- rbind(all_task, data_task)
 
 }
 
 # Reanonimize ============================================================
 
 # order based on the date of the experiment
-data_ppt <- data_ppt[order(data_ppt$Experiment_StartDate), ]
+all_ppt <- all_ppt[order(all_ppt$Experiment_StartDate), ]
 # Create correspondence map (mapping original Participant IDs to new ones)
-correspondance <- setNames(paste0("S", sprintf("%03d", seq_along(data_ppt$Participant))), data_ppt$Participant)
+correspondance <- setNames(paste0("S", sprintf("%03d", seq_along(all_ppt$Participant))), all_ppt$Participant)
 # Reanonymize both datasets by updating the 'Participant' column
-data_ppt$Participant <- correspondance[data_ppt$Participant]
-data_task$Participant <- correspondance[data_task$Participant]
+all_ppt$Participant <- correspondance[all_ppt$Participant]
+all_task$Participant <- correspondance[all_task$Participant]
 
 # Save --------------------------------------------------------------------
-
+# 
 write.csv(data_ppt, "../data/rawdata_participants.csv", row.names = FALSE)
 write.csv(data_task, "../data/rawdata_task.csv", row.names = FALSE)
 # 
 # # Change path to box folder of fiction film
 # write.csv(raffle_data, "C:/Users/millyhouldey/Desktop/Raffle/raffle_data.csv", row.names = FALSE)
-write.csv(raffle_data, "C:/Users/asf25/Box/FictionFilm/raffle/raffle_data.csv", row.names = FALSE)
+# write.csv(raffle_data, "C:/Users/asf25/Box/FictionFilm/raffle/raffle_data.csv", row.names = FALSE)
 
 
 
