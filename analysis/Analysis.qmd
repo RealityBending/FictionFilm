@@ -1,0 +1,12 @@
+---
+title: "Analysis"
+format: html
+editor: visual
+---
+```{r}
+library(tidyverse)
+data_ppt <- read.csv("../data/rawdata_participants.csv")
+
+data_task <- read.csv("../data/rawdata_task.csv")
+```
+
