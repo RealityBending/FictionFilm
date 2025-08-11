@@ -3,10 +3,37 @@ title: "Analysis"
 format: html
 editor: visual
 ---
+
 ```{r}
+
 library(tidyverse)
+library(gtsummary)
 data_ppt <- read.csv("../data/rawdata_participants.csv")
 
 data_task <- read.csv("../data/rawdata_task.csv")
-```
 
+table(data_ppt$media_professional, useNA = "ifany")
+
+# Create demographics comparison table
+demo_table <- data_ppt %>%
+  select(
+    media_professional,
+    Gender,
+    Age,
+    Education,
+    Discipline,
+    Student,
+    Ethnicity,
+    Country
+  ) %>%
+  tbl_summary(
+    by = media_professional,  # Group by TRUE vs FALSE
+    missing = "no"            # Keep missing values as their own category
+  ) %>%
+  add_p() %>%                  # Add statistical test for each variable
+  modify_header(label ~ "Media Professional") %>%
+  bold_labels()
+
+demo_table
+
+```
