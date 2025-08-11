@@ -2,8 +2,8 @@ library(jsonlite)
 library(progress)
 
 # path for data
-# path <- "/Users/millyhouldey/Desktop/osf_data"
-path <- "C:/Users/asf25/Box/FictionFilm/data/"
+path <- "/Users/millyhouldey/Desktop/osf_data"
+# path <- "C:/Users/asf25/Box/FictionFilm/data/"
 
 # JsPsych Experiment ----------------------------
 
@@ -172,7 +172,7 @@ write.csv(all_task, "../data/rawdata_task.csv", row.names = FALSE)
 # 
 # # Change path to box folder of fiction film
 # write.csv(raffle_data, "C:/Users/millyhouldey/Desktop/Raffle/raffle_data.csv", row.names = FALSE)
-write.csv(raffle_data, "C:/Users/asf25/Box/FictionFilm/raffle/raffle_data.csv", row.names = FALSE)
+# write.csv(raffle_data, "C:/Users/asf25/Box/FictionFilm/raffle/raffle_data.csv", row.names = FALSE)
 
 
 nrow(all_ppt)
