@@ -5,6 +5,7 @@ editor: visual
 ---
 
 ```{r}
+#| label: Demographics
 
 library(tidyverse)
 library(gtsummary)
@@ -36,6 +37,47 @@ demo_table <- data_ppt %>%
 
 demo_table
 
+```
 
+```{r}
+
+library(psych)
+library(dplyr)
+
+# Make sure the variables are numeric
+data_task <- data_task %>%
+  mutate(
+    enjoyable = as.numeric(Enjoyable),
+    likeable = as.numeric(Likeable),
+    pleasing = as.numeric(Pleasing)
+  )
+
+# Check internal consistency
+alpha(data_task[, c("Enjoyable", "Likeable", "Pleasing")])
+
+# Create the composite variable
+data_task <- data_task %>%
+  mutate(aesthetic = rowMeans(select(., Enjoyable, Likeable, Pleasing), na.rm = TRUE))
+
+
+```
+
+```{r}
+library(psych)
+library(dplyr)
+
+# Make sure the variables are numeric
+data_task <- data_task %>%
+  mutate(
+    expressive = as.numeric(Expressive),
+    emotional = as.numeric(Emotional)
+  )
+
+# Check internal consistency
+alpha(data_task[, c("Emotional", "Expressive")])
+
+# Create the composite variable
+data_task <- data_task %>%
+  mutate(emotional_expressive = rowMeans(select(., Emotional, Expressive, Pleasing), na.rm = TRUE))
 
 ```
