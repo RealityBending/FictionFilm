@@ -15,15 +15,16 @@ install.packages("broom.mixed")
 ```
 
 ```{r}
+#DONE DEMOGRAPHICS
 #| label: Demographics
 
 library(tidyverse)
 library(gtsummary)
-data_ppt <- read.csv("../data/rawdata_participants.csv")
 
+data_ppt <- read.csv("../data/rawdata_participants.csv")
 data_task <- read.csv("../data/rawdata_task.csv")
 
-table(data_ppt$media_professional, useNA = "ifany")
+invisible(table(data_ppt$media_professional, useNA = "ifany"))
 
 # Create demographics comparison table
 demo_table <- data_ppt %>%
@@ -38,14 +39,19 @@ demo_table <- data_ppt %>%
     Country
   ) %>%
   tbl_summary(
-    by = media_professional,  # Group by TRUE vs FALSE
-    missing = "no"            # Keep missing values as their own category
+    by = media_professional,    # Group by TRUE vs FALSE
+    missing = "no",
+    type = list(Gender ~ "categorical")  # (optional safeguard)
   ) %>%
-  add_p() %>%                  # Add statistical test for each variable
+  add_p(
+    test = all_continuous() ~ "wilcox.test",
+    test.args = all_continuous() ~ list(exact = FALSE)  # <-- removed conf.int
+  ) %>%
   modify_header(label ~ "Media Professional") %>%
   bold_labels()
 
 demo_table
+
 
 ```
 
@@ -145,304 +151,176 @@ print(round(cor_mat, 3))
 ```
 
 ```{r}
-# checking validity of stimuli and for any outliers
-# ===== Stimulus validation script =====
+# aesthetic H1(a)
+
+# Libraries
 library(dplyr)
-library(tidyr)
-library(ggplot2)
+library(psych)
 library(lme4)
-library(broom.mixed)
+library(lmerTest)    # adds p-values to lmer
+library(emmeans)     # EMMs & contrasts
+library(performance) # R2 etc.
+library(conflicted)
 
-# -------------------------------
-# 0) Basic checks
-# -------------------------------
-stopifnot(all(c("Participant","Stimulus","aesthetic","emotional_expressive","Confidence_label") %in% names(dat)))
+# Resolve function-name conflicts for this session
+conflicts_prefer(psych::alpha)   # alpha() = reliability
+conflicts_prefer(lmerTest::lmer) # lmer() = lmerTest version
 
-dat <- dat %>%
-  filter(!is.na(Stimulus), !is.na(Participant)) %>%
+# --- Make items numeric (safe if they came in as factors/character) ---
+data_task <- data_task %>%
   mutate(
+    enjoyable = as.numeric(as.character(Enjoyable)),
+    likeable  = as.numeric(as.character(Likeable)),
+    pleasing  = as.numeric(as.character(Pleasing))
+  )
+
+# --- Reliability (Cronbach's alpha) ---
+alpha_res <- psych::alpha(data_task[, c("enjoyable", "likeable", "pleasing")])
+alpha_res  # prints full table
+# If you want the number inline:
+# alpha_res$total$raw_alpha
+
+# --- Composite score ---
+data_task <- data_task %>%
+  mutate(aesthetic = rowMeans(dplyr::select(., enjoyable, likeable, pleasing), na.rm = TRUE))
+
+# --- Prep analysis data ---
+dat <- data_task %>%
+  filter(!is.na(aesthetic), !is.na(Condition), !is.na(Participant), !is.na(Stimulus)) %>%
+  mutate(
+    Condition   = factor(Condition, levels = c("AI", "Human")), # AI = reference
     Participant = factor(Participant),
     Stimulus    = factor(Stimulus)
   )
 
-# -------------------------------
-# 1) Stimulus-level descriptives
-# -------------------------------
-stim_desc <- dat %>%
-  group_by(Stimulus) %>%
-  summarise(
-    n_ratings      = n(),
-    mean_aesthetic = mean(aesthetic, na.rm = TRUE),
-    sd_aesthetic   = sd(aesthetic, na.rm = TRUE),
-    mean_emotion   = mean(emotional_expressive, na.rm = TRUE),
-    sd_emotion     = sd(emotional_expressive, na.rm = TRUE),
-    mean_confidence= mean(Confidence_label, na.rm = TRUE),
-    sd_confidence  = sd(Confidence_label, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# Quick glimpse
-print(head(stim_desc, 10))
-
-# -------------------------------
-# 2) Stimulus ICCs via mixed models
-#    ICC_stim = Var(Stimulus) / [Var(Stimulus) + Var(residual)]
-#    We include Participant random intercept to account for rater baselines.
-# -------------------------------
-icc_from_model <- function(formula, data) {
-  m <- lmer(formula, data = data, REML = TRUE)
-  vc <- as.data.frame(VarCorr(m))
-  var_stim <- vc$vcov[vc$grp == "Stimulus"]
-  var_res  <- vc$vcov[vc$grp == "Residual"]
-  icc_stim <- var_stim / (var_stim + var_res)
-  list(model = m, icc_stim = icc_stim, var_table = vc)
-}
-
-icc_aesthetic <- icc_from_model(aesthetic ~ 1 + (1|Stimulus) + (1|Participant), dat)
-icc_emotion   <- icc_from_model(emotional_expressive ~ 1 + (1|Stimulus) + (1|Participant), dat)
-icc_conf      <- icc_from_model(Confidence_label ~ 1 + (1|Stimulus) + (1|Participant), dat)
-
-cat("\n--- Stimulus ICCs (proportion of variance at stimulus level) ---\n")
-cat(sprintf("Aesthetic:            ICC_stim = %.3f\n", icc_aesthetic$icc_stim))
-cat(sprintf("Emotional/Expressive: ICC_stim = %.3f\n", icc_emotion$icc_stim))
-cat(sprintf("Confidence (Task 2):  ICC_stim = %.3f\n", icc_conf$icc_stim))
-
-# -------------------------------
-# 3) Outlier detection at stimulus level
-#    Flag stimuli whose mean is > 2 SD from the stimulus mean distribution
-# -------------------------------
-zflag <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
-
-stim_outliers <- stim_desc %>%
-  mutate(
-    z_aesthetic = zflag(mean_aesthetic),
-    z_emotion   = zflag(mean_emotion),
-    z_conf      = zflag(mean_confidence),
-    outlier_any = abs(z_aesthetic) > 2 | abs(z_emotion) > 2 | abs(z_conf) > 2
-  ) %>%
-  arrange(desc(outlier_any), Stimulus)
-
-cat("\n--- Potential stimulus outliers (>2 SD on any metric) ---\n")
-print(stim_outliers %>% filter(outlier_any) %>% select(Stimulus, mean_aesthetic, mean_emotion, mean_confidence, z_aesthetic, z_emotion, z_conf))
-
-# -------------------------------
-# 4) Stimulus-level correlations & quick visuals
-# -------------------------------
-# Correlations across stimuli (means)
-cor_mat <- stim_desc %>%
-  select(mean_aesthetic, mean_emotion, mean_confidence) %>%
-  cor(use = "pairwise.complete.obs")
-
-cat("\n--- Stimulus-level correlations (means across stimuli) ---\n")
-print(round(cor_mat, 3))
-
-# Plots (appendix-friendly)
-p1 <- ggplot(stim_desc, aes(x = mean_aesthetic)) +
-  geom_histogram(bins = 20, alpha = 0.7) +
-  labs(title = "Stimulus mean — Aesthetic", x = "Mean aesthetic", y = "Count") +
-  theme_minimal()
-
-p2 <- ggplot(stim_desc, aes(x = mean_emotion)) +
-  geom_histogram(bins = 20, alpha = 0.7) +
-  labs(title = "Stimulus mean — Emotional/Expressive", x = "Mean emotional/expressive", y = "Count") +
-  theme_minimal()
-
-p3 <- ggplot(stim_desc, aes(x = mean_confidence)) +
-  geom_histogram(bins = 20, alpha = 0.7) +
-  labs(title = "Stimulus mean — Task 2 human-likeness", x = "Mean confidence (0–6)", y = "Count") +
-  theme_minimal()
-
-p_sc1 <- ggplot(stim_desc, aes(x = mean_aesthetic, y = mean_emotion)) +
-  geom_point(alpha = 0.7) +
-  geom_smooth(method = "lm", se = TRUE) +
-  labs(title = "Stimulus means: Aesthetic vs Emotionality", x = "Mean aesthetic", y = "Mean emotional/expressive") +
-  theme_minimal()
-
-p_sc2 <- ggplot(stim_desc, aes(x = mean_aesthetic, y = mean_confidence)) +
-  geom_point(alpha = 0.7) +
-  geom_smooth(method = "lm", se = TRUE) +
-  labs(title = "Stimulus means: Aesthetic vs Task-2 human-likeness", x = "Mean aesthetic", y = "Mean confidence (0–6)") +
-  theme_minimal()
-
-p_sc3 <- ggplot(stim_desc, aes(x = mean_emotion, y = mean_confidence)) +
-  geom_point(alpha = 0.7) +
-  geom_smooth(method = "lm", se = TRUE) +
-  labs(title = "Stimulus means: Emotionality vs Task-2 human-likeness", x = "Mean emotional/expressive", y = "Mean confidence (0–6)") +
-  theme_minimal()
-
-print(p1); print(p2); print(p3)
-print(p_sc1); print(p_sc2); print(p_sc3)
-
-
-m_slope <- lmer(Confidence_label ~ Condition + (1|Participant) + (1 + Condition|Stimulus), data = dat, REML = TRUE)
-# print(VarCorr(m_slope))  # If the random-slope variance for Condition is small, label effect is fairly consistent across clips
-
-```
-
-```{r}
-# aesthetic H1(a)
-library(psych)
-library(dplyr)
-
-# Make sure the variables are numeric
-data_task <- data_task %>%
-  mutate(
-    enjoyable = as.numeric(Enjoyable),
-    likeable = as.numeric(Likeable),
-    pleasing = as.numeric(Pleasing)
-  )
-
-# Check internal consistency
-alpha(data_task[, c("Enjoyable", "Likeable", "Pleasing")])
-
-# Create the composite variable
-data_task <- data_task %>%
-  mutate(aesthetic = rowMeans(select(., Enjoyable, Likeable, Pleasing), na.rm = TRUE))
-
-# --- H1(a): Human-made > AI-generated on aesthetic ratings ---
-
-# Packages
-install.packages(c("lme4","lmerTest","emmeans","dplyr","performance"), dependencies = TRUE)
-library(lme4)
-library(lmerTest)   # p-values for lmer
-library(emmeans)    # marginal means & contrasts
-library(dplyr)
-library(performance)
-
-# 0) Tidy/encode
-dat <- data_task %>%
-  # keep rows you need
-  filter(!is.na(aesthetic), !is.na(Condition), !is.na(Participant), !is.na(Stimulus)) %>%
-  # make sure Condition is a factor with AI as the reference
-  mutate(Condition = factor(Condition, levels = c("AI","Human")),
-         Participant = factor(Participant),
-         Stimulus    = factor(Stimulus))
-
-# 1) Fit mixed model (random intercepts for Participant and Stimulus)
-m1 <- lmer(aesthetic ~ Condition + (1|Participant) + (1|Stimulus), data = dat, REML = FALSE)
-
-# 2) Model summary (ConditionHuman-made is the Human - AI difference)
+# --- Mixed model (random intercepts for Participant & Stimulus) ---
+m1 <- lmer(aesthetic ~ Condition + (1 | Participant) + (1 | Stimulus),
+           data = dat, REML = FALSE)
 summary(m1)
 
-# 3) Estimated marginal means (group means) and contrast
-emm  <- emmeans(m1, ~ Condition)
-emm
-contrast(emm, method = "revpairwise")  # Human-made - AI-generated (since AI is reference)
+# --- Enable Satterthwaite df in emmeans for large N ---
+emmeans::emm_options(
+  pbkrtest.limit = nrow(dat),
+  lmerTest.limit = nrow(dat),
+  lmer.df        = "satterthwaite"  # be explicit
+)
 
-# 4) Quick effect-size style info
-# (report the estimated mean difference with 95% CI; for mixed models this is common practice)
-emm_diff <- contrast(emm, "revpairwise") %>% summary(infer = TRUE)  # gives estimate, SE, df, t, p, CI
-emm_diff
-
-# Optional: semi-partial R2 for fixed effects (nice to report)
-performance::r2(m1)
-
-# 5) (Optional) More flexible random effects: allow Participant-specific slopes, if data supports it
-#    If this fails to converge, keep m1.
-m2 <- try(lmer(aesthetic ~ Condition + (1 + Condition | Participant) + (1|Stimulus),
-               data = dat, REML = FALSE))
-if (!inherits(m2, "try-error")) {
-  anova(m1, m2)  # compare; if m2 isn't better or fails, stick with m1
-}
-
-# 6) (Optional) Basic diagnostic checks
-check_model(m1)  # opens diagnostic plots
-
-# After fitting your model as m1
-library(emmeans)
-
-# 1. Estimated marginal means for each condition
+# --- Estimated marginal means and contrast (Human - AI) with Satterthwaite df ---
 emm <- emmeans(m1, ~ Condition)
 emm
+contrast(emm, "revpairwise") %>% summary(infer = TRUE)
 
-# 2. Pairwise comparison (Human-made - AI-generated)
-contrast(emm, method = "revpairwise") %>% summary(infer = TRUE)
+# --- (Optional) R2 for reporting ---
+performance::r2(m1)
 
+# --- (Optional) Random slopes by Participant; compare to m1 ---
+m2 <- try(lmer(aesthetic ~ Condition + (1 + Condition | Participant) + (1 | Stimulus),
+               data = dat, REML = FALSE))
+if (!inherits(m2, "try-error")) {
+  print(anova(m1, m2))  # chi-square test of fit improvement
+  # If you decide to report m2 instead, you can get EMMs the same way:
+  # emm2 <- emmeans(m2, ~ Condition)
+  # contrast(emm2, "revpairwise") %>% summary(infer = TRUE)
+}
+# (You already fit m1 earlier)
+# Ensure emmeans uses Satterthwaite df for large N
+emmeans::emm_options(
+  pbkrtest.limit = nrow(dat),
+  lmerTest.limit = nrow(dat),
+  lmer.df        = "satterthwaite"
+)
+
+# Estimated marginal means and contrast (now with df, not Inf)
+emm <- emmeans::emmeans(m1, ~ Condition)
+emm
+emmeans::contrast(emm, "revpairwise") %>% summary(infer = TRUE)
+
+
+# --- (Optional) Diagnostics ---
+# check_model(m1)  # opens plots
 
 ```
 
 ```{r}
 #emotional_expressive H1(b)
-library(psych)
-library(dplyr)
 
-# Make sure the variables are numeric
+# Libraries
+library(dplyr)
+library(psych)
+library(lme4)
+library(lmerTest)    # adds p-values to lmer
+library(emmeans)     # EMMs & contrasts
+library(performance) # R2 etc.
+library(conflicted)
+
+# Resolve function-name conflicts for this session
+suppressMessages({
+  conflicts_prefer(psych::alpha)   # alpha() = reliability
+  conflicts_prefer(lmerTest::lmer) # lmer() = lmerTest version
+})
+
+# --- Make items numeric (safe if factors/characters) ---
 data_task <- data_task %>%
   mutate(
-    expressive = as.numeric(Expressive),
-    emotional = as.numeric(Emotional)
+    emotional  = as.numeric(as.character(Emotional)),
+    expressive = as.numeric(as.character(Expressive))
   )
 
-# Check internal consistency
-alpha(data_task[, c("Emotional", "Expressive")])
+# --- Reliability (Cronbach's alpha) ---
+alpha_res_b <- psych::alpha(data_task[, c("emotional", "expressive")])
+alpha_res_b  # prints full table
+# alpha_res_b$total$raw_alpha  # if you want the value for reporting
 
-# Create the composite variable
+# --- Composite score ---
 data_task <- data_task %>%
-  mutate(emotional_expressive = rowMeans(select(., Emotional, Expressive), na.rm = TRUE))
+  mutate(emotional_expressive = rowMeans(dplyr::select(., emotional, expressive), na.rm = TRUE))
 
-# --- H1(a): Human-made > AI-generated on aesthetic ratings ---
-
-# Packages
-install.packages(c("lme4","lmerTest","emmeans","dplyr","performance"), dependencies = TRUE)
-library(lme4)
-library(lmerTest)   # p-values for lmer
-library(emmeans)    # marginal means & contrasts
-library(dplyr)
-library(performance)
-
-# 0) Tidy/encode
+# --- Prep analysis data ---
 dat <- data_task %>%
-  # keep rows you need
   filter(!is.na(emotional_expressive), !is.na(Condition), !is.na(Participant), !is.na(Stimulus)) %>%
-  # make sure Condition is a factor with AI as the reference
-  mutate(Condition = factor(Condition, levels = c("AI","Human")),
-         Participant = factor(Participant),
-         Stimulus    = factor(Stimulus))
+  mutate(
+    Condition   = factor(Condition, levels = c("AI", "Human")), # AI = reference
+    Participant = factor(Participant),
+    Stimulus    = factor(Stimulus)
+  )
 
-# 1) Fit mixed model (random intercepts for Participant and Stimulus)
-m1 <- lmer(emotional_expressive ~ Condition + (1|Participant) + (1|Stimulus), data = dat, REML = FALSE)
-
-# 2) Model summary (ConditionHuman-made is the Human - AI difference)
+# --- Mixed model (random intercepts for Participant & Stimulus) ---
+m1 <- lmer(emotional_expressive ~ Condition + (1 | Participant) + (1 | Stimulus),
+           data = dat, REML = FALSE)
 summary(m1)
 
-# 3) Estimated marginal means (group means) and contrast
-emm  <- emmeans(m1, ~ Condition)
-emm
-contrast(emm, method = "revpairwise")  # Human-made - AI-generated (since AI is reference)
+# --- Enable Satterthwaite df in emmeans for large N ---
+emmeans::emm_options(
+  pbkrtest.limit = nrow(dat),
+  lmerTest.limit = nrow(dat),
+  lmer.df        = "satterthwaite"
+)
 
-# 4) Quick effect-size style info
-# (report the estimated mean difference with 95% CI; for mixed models this is common practice)
-emm_diff <- contrast(emm, "revpairwise") %>% summary(infer = TRUE)  # gives estimate, SE, df, t, p, CI
-emm_diff
+# --- Estimated marginal means and contrast (Human - AI) with Satterthwaite df ---
+emm_b <- emmeans(m1, ~ Condition)
+emm_b
+contrast(emm_b, "revpairwise") %>% summary(infer = TRUE)
 
-# Optional: semi-partial R2 for fixed effects (nice to report)
+# --- (Optional) R2 for reporting ---
 performance::r2(m1)
 
-# 5) (Optional) More flexible random effects: allow Participant-specific slopes, if data supports it
-#    If this fails to converge, keep m1.
-m2 <- try(lmer(emotional_expressive ~ Condition + (1 + Condition | Participant) + (1|Stimulus),
+# --- (Optional) Random slopes by Participant; compare to m1 ---
+m2 <- try(lmer(emotional_expressive ~ Condition + (1 + Condition | Participant) + (1 | Stimulus),
                data = dat, REML = FALSE))
 if (!inherits(m2, "try-error")) {
-  anova(m1, m2)  # compare; if m2 isn't better or fails, stick with m1
+  print(anova(m1, m2))  # chi-square test of fit improvement
+  # If you decide to report m2 instead:
+  # emm_b2 <- emmeans(m2, ~ Condition)
+  # contrast(emm_b2, "revpairwise") %>% summary(infer = TRUE)
 }
 
-# 6) (Optional) Basic diagnostic checks
-check_model(m1)  # opens diagnostic plots
-
-# After fitting your model as m1
-library(emmeans)
-
-# 1. Estimated marginal means for each condition
-emm <- emmeans(m1, ~ Condition)
-emm
-
-# 2. Pairwise comparison (Human-made - AI-generated)
-contrast(emm, method = "revpairwise") %>% summary(infer = TRUE)
-
+# --- (Optional) Diagnostics ---
+# check_model(m1)  # opens plots
 
 ```
 
 ```{r}
+#checking if top 25% emotional_expressive stims have different results
 library(dplyr)
 library(lme4)
 library(lmerTest)
@@ -484,6 +362,74 @@ print(emm_high)
 
 # 7. Difference with 95% CI
 contrast(emm_high, method = "revpairwise") %>% summary(infer = TRUE)
+
+```
+
+```{r}
+#official visual for H1a&b
+p_violin <- ggplot(plot_df, aes(x = Condition, y = Score, fill = Condition, color = Condition)) +
+  geom_violin(alpha = 0.20, trim = FALSE, linewidth = 0.4) +
+  geom_boxplot(width = 0.18, outlier.alpha = 0.25, alpha = 0.50, position = position_dodge(width = 0.8)) +
+  # FIX: add x = Condition here and keep inherit.aes = FALSE
+  geom_pointrange(data = emm_df,
+                  aes(x = Condition, y = emmean, ymin = lower.CL, ymax = upper.CL),
+                  inherit.aes = FALSE,
+                  position = position_dodge(width = 0.6),
+                  size = 1.0, fatten = 2, color = "black") +
+  facet_wrap(~ Outcome, nrow = 1, scales = "fixed") +
+  scale_fill_manual(values = c("AI" = "#1f77b4", "Human" = "#d62728")) +
+  scale_color_manual(values = c("AI" = "#1f77b4", "Human" = "#d62728")) +
+  labs(x = NULL, y = "Rating (0–6)",
+       title = "Distributions by condition with model-estimated means (95% CI)") +
+  theme_bw(base_size = 13) +
+  theme(
+    legend.position = "top",
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(face = "bold")
+  )
+
+```
+
+```{r}
+#visual comapre H1a and b
+# If needed: install.packages("ggimage")
+library(ggplot2)
+library(ggimage)
+library(dplyr)
+library(emmeans)
+
+# (Assumes you already have m_aesthetic/m_emoxpr from earlier code)
+emm_a_obj <- emmeans(m_aesthetic, ~ Condition)
+emm_b_obj <- emmeans(m_emoxpr,    ~ Condition)
+
+emm_df <- bind_rows(
+  as.data.frame(emm_a_obj) %>% mutate(Outcome = "Aesthetic"),
+  as.data.frame(emm_b_obj) %>% mutate(Outcome = "Emotional/Expressive")
+)
+
+# Use PNG emoji icons instead of SVG (no rsvg dependency)
+# Twemoji PNGs (72x72). If these ever 404, swap to a different PNG URL.
+emm_df$image <- ifelse(
+  emm_df$Condition == "Human",
+  "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f464.png", # 👤
+  "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f4bb.png"  # 💻
+)
+
+pos <- position_dodge(width = 0.6)
+
+ggplot(emm_df, aes(x = Outcome, y = emmean, group = Condition)) +
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL),
+                position = pos, width = 0.12, linewidth = 0.5) +
+  geom_image(aes(image = image), position = pos, size = 0.08) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +
+  labs(x = NULL, y = "Estimated marginal mean (0–6)",
+       title = "Aesthetic Pleasure VS Emotionality/Expressivity: AI vs Human") +
+  theme_classic(base_size = 14) +
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 12, hjust = 1))
+
 
 ```
 
@@ -639,30 +585,6 @@ emm <- emmeans(m_h4, ~ Condition)
 emm
 contrast(emm, method = "revpairwise") %>% summary(infer = TRUE)
 
-
-```
-
-```{r}
-#labelling matches in task 2?
-
-library(dplyr)
-library(lme4)
-
-# Create binary match variable
-dat <- dat %>%
-  mutate(
-    match_label = ifelse(
-      (Condition == "Human" & Confidence_label > 3) |
-      (Condition == "AI" & Confidence_label < 3),
-      1, 0
-    )
-  )
-
-# Run logistic mixed model
-m_bin <- glmer(match_label ~ Condition + (1|Participant) + (1|Stimulus),
-               data = dat, family = binomial)
-
-summary(m_bin)
 
 ```
 
