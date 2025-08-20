@@ -298,7 +298,9 @@ t.test(BAIT_score ~ media_professional, data = dat)
 ```
 
 ```{r}
-# aesthetic H1(a)
+# --- H1(a): Aesthetic ratings ---
+
+exclude_ids <- c("S007", "S014", "S018", "S029", "S033", "S059")
 
 # Libraries
 library(dplyr)
@@ -309,9 +311,9 @@ library(emmeans)     # EMMs & contrasts
 library(performance) # R2 etc.
 library(conflicted)
 
-# Resolve function-name conflicts for this session
-conflicts_prefer(psych::alpha)   # alpha() = reliability
-conflicts_prefer(lmerTest::lmer) # lmer() = lmerTest version
+# Resolve function-name conflicts
+conflicts_prefer(dplyr::filter)   # make sure filter() = dplyr
+conflicts_prefer(lmerTest::lmer)  # make sure lmer() = lmerTest
 
 # --- Make items numeric (safe if they came in as factors/character) ---
 data_task <- data_task %>%
@@ -323,9 +325,7 @@ data_task <- data_task %>%
 
 # --- Reliability (Cronbach's alpha) ---
 alpha_res <- psych::alpha(data_task[, c("enjoyable", "likeable", "pleasing")])
-alpha_res  # prints full table
-# If you want the number inline:
-# alpha_res$total$raw_alpha
+print(alpha_res$total$raw_alpha)   # clean alpha value
 
 # --- Composite score ---
 data_task <- data_task %>%
@@ -333,7 +333,7 @@ data_task <- data_task %>%
 
 # --- Prep analysis data ---
 dat <- data_task %>%
-  filter(!is.na(aesthetic), !is.na(Condition), !is.na(Participant), !is.na(Stimulus)) %>%
+  dplyr::filter(!is.na(aesthetic), !is.na(Condition), !is.na(Participant), !is.na(Stimulus)) %>%
   mutate(
     Condition   = factor(Condition, levels = c("AI", "Human")), # AI = reference
     Participant = factor(Participant),
@@ -345,14 +345,14 @@ m1 <- lmer(aesthetic ~ Condition + (1 | Participant) + (1 | Stimulus),
            data = dat, REML = FALSE)
 summary(m1)
 
-# --- Enable Satterthwaite df in emmeans for large N ---
+# --- Enable Satterthwaite df in emmeans ---
 emmeans::emm_options(
   pbkrtest.limit = nrow(dat),
   lmerTest.limit = nrow(dat),
-  lmer.df        = "satterthwaite"  # be explicit
+  lmer.df        = "satterthwaite"
 )
 
-# --- Estimated marginal means and contrast (Human - AI) with Satterthwaite df ---
+# --- Estimated marginal means and contrast (Human - AI) ---
 emm <- emmeans(m1, ~ Condition)
 emm
 contrast(emm, "revpairwise") %>% summary(infer = TRUE)
@@ -360,31 +360,26 @@ contrast(emm, "revpairwise") %>% summary(infer = TRUE)
 # --- (Optional) R2 for reporting ---
 performance::r2(m1)
 
-# --- (Optional) Random slopes by Participant; compare to m1 ---
+# --- (Optional) Random slopes by Participant ---
 m2 <- try(lmer(aesthetic ~ Condition + (1 + Condition | Participant) + (1 | Stimulus),
                data = dat, REML = FALSE))
 if (!inherits(m2, "try-error")) {
-  print(anova(m1, m2))  # chi-square test of fit improvement
-  # If you decide to report m2 instead, you can get EMMs the same way:
-  # emm2 <- emmeans(m2, ~ Condition)
-  # contrast(emm2, "revpairwise") %>% summary(infer = TRUE)
+  print(anova(m1, m2))  
 }
-# (You already fit m1 earlier)
-# Ensure emmeans uses Satterthwaite df for large N
-emmeans::emm_options(
-  pbkrtest.limit = nrow(dat),
-  lmerTest.limit = nrow(dat),
-  lmer.df        = "satterthwaite"
-)
 
-# Estimated marginal means and contrast (now with df, not Inf)
-emm <- emmeans::emmeans(m1, ~ Condition)
-emm
-emmeans::contrast(emm, "revpairwise") %>% summary(infer = TRUE)
+# --- Diagnostics (optional) ---
+# performance::check_model(m1)
 
 
-# --- (Optional) Diagnostics ---
-# check_model(m1)  # opens plots
+```
+
+```{r}
+# Define exclusion list
+exclude_ids <- c("S007","S014","S018","S029","S033","S059")
+
+# Drop them once from data_task
+data_task <- data_task %>%
+  dplyr::filter(!Participant %in% exclude_ids)
 
 ```
 
@@ -413,10 +408,7 @@ data_task <- data_task %>%
     expressive = as.numeric(as.character(Expressive))
   )
 
-# --- Reliability (Cronbach's alpha) ---
-alpha_res_b <- psych::alpha(data_task[, c("emotional", "expressive")])
-alpha_res_b  # prints full table
-# alpha_res_b$total$raw_alpha  # if you want the value for reporting
+cor(data_task$emotional, data_task$expressive, use = "pairwise.complete.obs")
 
 # --- Composite score ---
 data_task <- data_task %>%
@@ -588,7 +580,7 @@ p_violin <- ggplot(plot_df, aes(x = Condition, y = Score, fill = Condition, colo
   scale_fill_manual(values = cond_cols) +
   scale_color_manual(values = cond_cols) +
   labs(x = NULL, y = "Rating (0–6)",
-       title = "Distributions by condition with model-estimated means (95% CI)") +
+       title = "Aesthetic Pleasure & Emotional/Expressive Ratings") +
   theme_bw(base_size = 13) +
   theme(
     legend.position = "top",
@@ -621,47 +613,6 @@ p_box <- ggplot(plot_df, aes(x = Condition, y = Score, fill = Condition, color =
   )
 
 # p_box  # uncomment to show the boxplot version instead
-
-```
-
-```{r}
-#visual comapre H1a and b
-# If needed: install.packages("ggimage")
-library(ggplot2)
-library(ggimage)
-library(dplyr)
-library(emmeans)
-
-# (Assumes you already have m_aesthetic/m_emoxpr from earlier code)
-emm_a_obj <- emmeans(m_aesthetic, ~ Condition)
-emm_b_obj <- emmeans(m_emoxpr,    ~ Condition)
-
-emm_df <- bind_rows(
-  as.data.frame(emm_a_obj) %>% mutate(Outcome = "Aesthetic"),
-  as.data.frame(emm_b_obj) %>% mutate(Outcome = "Emotional/Expressive")
-)
-
-# Use PNG emoji icons instead of SVG (no rsvg dependency)
-# Twemoji PNGs (72x72). If these ever 404, swap to a different PNG URL.
-emm_df$image <- ifelse(
-  emm_df$Condition == "Human",
-  "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f464.png", # 👤
-  "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f4bb.png"  # 💻
-)
-
-pos <- position_dodge(width = 0.6)
-
-ggplot(emm_df, aes(x = Outcome, y = emmean, group = Condition)) +
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL),
-                position = pos, width = 0.12, linewidth = 0.5) +
-  geom_image(aes(image = image), position = pos, size = 0.08) +
-  scale_y_continuous(expand = expansion(mult = c(0.05, 0.12))) +
-  labs(x = NULL, y = "Estimated marginal mean (0–6)",
-       title = "Aesthetic Pleasure VS Emotionality/Expressivity: AI vs Human") +
-  theme_classic(base_size = 14) +
-  theme(legend.position = "none",
-        axis.text.x = element_text(angle = 12, hjust = 1))
-
 
 ```
 
@@ -722,20 +673,20 @@ library(lmerTest)
 library(emmeans)
 library(ggplot2)
 
-# 1) Fit interaction models (Condition * media_professional) --------------------
+# 1) Fit interaction models (Condition * media_professional)
 m_aes <- lmer(aesthetic ~ Condition * media_professional + (1|Participant) + (1|Stimulus),
               data = dat, REML = FALSE)
 m_emo <- lmer(emotional_expressive ~ Condition * media_professional + (1|Participant) + (1|Stimulus),
               data = dat, REML = FALSE)
 
-# Use Satterthwaite df in emmeans (to match your reporting)
+# Use Satterthwaite df in emmeans
 emmeans::emm_options(
   pbkrtest.limit = nrow(dat),
   lmerTest.limit = nrow(dat),
   lmer.df        = "satterthwaite"
 )
 
-# 2) EMMs by Condition within media_professional for both outcomes -------------
+# 2) EMMs by Condition within media_professional
 emm_aes <- emmeans(m_aes, ~ Condition | media_professional) %>%
   as.data.frame() %>% mutate(Outcome = "Aesthetic")
 
@@ -748,7 +699,7 @@ emm_all <- bind_rows(emm_aes, emm_emo) %>%
     media_professional = factor(media_professional, levels = c("No","Yes"))
   )
 
-# 3) Two-panel interaction plot (main figure) ----------------------------------
+# 3) Two-panel interaction plot
 p_interaction <- ggplot(emm_all,
                         aes(x = Condition, y = emmean,
                             group = media_professional, color = media_professional)) +
@@ -757,11 +708,11 @@ p_interaction <- ggplot(emm_all,
   geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL),
                 width = 0.06, position = position_dodge(width = 0.30), linewidth = 0.9) +
   facet_wrap(~ Outcome, nrow = 1) +
-  scale_color_manual(values = c("No" = "#1f77b4", "Yes" = "#d62728"),
-                     name = "Media professional") +
+  scale_color_manual(values = c("No" = "#e377c2", "Yes" = "#2ca02c"),
+                     name = "Media Professional") +
   scale_y_continuous(limits = c(0, 6), expand = expansion(mult = c(0.02, 0.06))) +
   labs(x = NULL, y = "Estimated marginal mean (0–6)",
-       title = "Interaction between label (AI vs Human) and media professionalism") +
+       title = "Media Professionalism as a Moderator") +
   theme_bw(base_size = 13) +
   theme(legend.position = "top",
         strip.text = element_text(face = "bold"),
@@ -772,108 +723,159 @@ p_interaction
 ```
 
 ```{r}
-# H2(b): BAIT x Label predicting Aesthetic & Emotional/Expressive
-# - build BAIT_score inside the join so it always exists
-# - ensure Condition/IDs are factors
-# - fit models + plot side-by-side interactions
-
+# H2(b): Build BAIT (higher = more pro-AI), join to trials, and fit models
 library(dplyr)
 library(lme4)
 library(lmerTest)
-library(ggeffects)
-library(ggplot2)
-library(patchwork)
+library(emmeans)
 
-## 0) Make sure we have these in memory:
-## dat      -> trial-level data with columns: Participant, Stimulus, Condition, aesthetic, emotional_expressive
-## data_ppt -> participant-level data with BAIT_... columns
-
-# standardize key
+# 0) Make sure IDs are character so the join succeeds
 dat2      <- dat      %>% mutate(Participant = as.character(Participant))
 data_ppt2 <- data_ppt %>% mutate(Participant = as.character(Participant))
 
-# define BAIT columns to drop (if present)
+# Columns to drop if present (not part of the scale)
 bait_drop <- c("BAIT_AI_Knowledge","BAIT_AI_Use","BAIT_AttentionCheck")
 
-# define *positively* framed items (reverse these so higher = more negative)
-pos_items_all <- c(
-  "BAIT_1_ImagesRealistic","BAIT_4_VideosRealistic","BAIT_5_ImitatingReality",
-  "BAIT_6_EnvironmentReal","BAIT_7_TextRealistic","BAIT_11_Exciting",
-  "BAIT_12_Benefit","BAIT_14_ArtRealistic"
+# NEGATIVELY framed items to reverse so that higher = more pro-AI
+neg_items <- c(
+  "BAIT_2_ImagesIssues",      # “AI images always have errors”
+  "BAIT_3_VideosIssues",      # “AI videos have obvious problems”
+  "BAIT_8_TextIssues",        # “AI text reads differently”
+  "BAIT_9_Dangerous",         # “AI is dangerous”
+  "BAIT_10_Worry",            # “I am worried about AI”
+  "BAIT_13_ArtIssues"         # “Human art evokes stronger emotions than AI”
 )
 
-# 1) Build BAIT_score inline, then join
+# 1) Build BAIT_score on the participant frame, then join
+ppt_bait <- data_ppt2 %>%
+  select(Participant, starts_with("BAIT_")) %>%
+  select(-any_of(bait_drop)) %>%
+  # coerce to numeric (handles factors/characters safely)
+  mutate(across(starts_with("BAIT_"), ~ as.numeric(as.character(.)))) %>%
+  # reverse only the NEGATIVE items that exist (0–6 scale assumed)
+  mutate(across(any_of(intersect(neg_items, names(.))), ~ 6 - .)) %>%
+  # BAIT_score = row mean across all kept BAIT items (higher = more pro-AI)
+  mutate(BAIT_score = rowMeans(select(., starts_with("BAIT_")), na.rm = TRUE)) %>%
+  select(Participant, BAIT_score)
+
+# 2) Join BAIT to trial-level data and prepare analysis variables
 dat_bait <- dat2 %>%
-  left_join(
-    data_ppt2 %>%
-      # keep Participant + BAIT columns
-      select(Participant, starts_with("BAIT_")) %>%
-      # drop unwanted columns if they exist
-      select(-any_of(bait_drop)) %>%
-      # coerce all BAIT to numeric
-      mutate(across(starts_with("BAIT_"), ~ as.numeric(as.character(.)))) %>%
-      # reverse the "positive" items so higher = more negative attitude (0–6 assumed)
-      {
-        # only reverse those that exist
-        pos_items <- intersect(pos_items_all, names(.))
-        . %>% mutate(across(all_of(pos_items), ~ 6 - .))
-      } %>%
-      # compute BAIT_score (row mean across remaining BAIT)
-      mutate(BAIT_score = rowMeans(select(., starts_with("BAIT_")), na.rm = TRUE)) %>%
-      select(Participant, BAIT_score),
-    by = "Participant"
-  ) %>%
-  # keep only rows that have a BAIT score
+  left_join(ppt_bait, by = "Participant") %>%
   filter(!is.na(BAIT_score)) %>%
-  # set analysis factors
   mutate(
-    BAIT_c      = as.numeric(scale(BAIT_score, center = TRUE, scale = FALSE)),
+    BAIT_c      = as.numeric(scale(BAIT_score, center = TRUE, scale = FALSE)), # mean-centered
     Condition   = factor(Condition, levels = c("AI","Human")),
     Participant = factor(Participant),
     Stimulus    = factor(Stimulus)
   )
 
-# quick sanity check (optional):
-# stopifnot(all(c("aesthetic","emotional_expressive","Condition","Participant","Stimulus","BAIT_c") %in% names(dat_bait)))
+# ---- Quick “I can see it worked” checks ----
+cat("Participants with BAIT after join:", n_distinct(dat_bait$Participant), "\n")
+cat("Trials with BAIT after join:", nrow(dat_bait), "\n")
+cat("BAIT_score summary (higher = more pro-AI):\n")
+print(summary(dat_bait$BAIT_score))
+cat("Correlation of BAIT with two example items (if present):\n")
+if ("BAIT_11_Exciting" %in% names(data_ppt2)) {
+  tmp <- left_join(dat_bait %>% distinct(Participant, BAIT_score),
+                   data_ppt2 %>% select(Participant, BAIT_11_Exciting),
+                   by = "Participant")
+  print(cor(tmp$BAIT_score, as.numeric(tmp$BAIT_11_Exciting), use = "pairwise"))
+}
 
-# 2) Fit mixed models
+# 3) Fit the H2(b) mixed models: BAIT × Condition
 m_aes <- lmer(aesthetic ~ BAIT_c * Condition + (1|Participant) + (1|Stimulus),
               data = dat_bait, REML = FALSE)
-
 m_emo <- lmer(emotional_expressive ~ BAIT_c * Condition + (1|Participant) + (1|Stimulus),
               data = dat_bait, REML = FALSE)
 
-# 3) Predictions for plots
-pred_aes <- ggpredict(m_aes, terms = c("BAIT_c [all]", "Condition"))
-pred_emo <- ggpredict(m_emo, terms = c("BAIT_c [all]", "Condition"))
+# Satterthwaite dfs for emmeans (optional, for consistency with earlier reporting)
+emmeans::emm_options(
+  pbkrtest.limit = nrow(dat_bait),
+  lmerTest.limit = nrow(dat_bait),
+  lmer.df        = "satterthwaite"
+)
 
-# 4) Side-by-side interaction plots
+cat("\n--- Aesthetic: BAIT × Condition ---\n")
+print(summary(m_aes))
+cat("\nSimple slopes for BAIT within each Condition (aesthetic):\n")
+print(emtrends(m_aes, ~ Condition, var = "BAIT_c"))
+print(contrast(emtrends(m_aes, ~ Condition, var = "BAIT_c"), "pairwise"))
+
+cat("\n--- Emotional/Expressive: BAIT × Condition ---\n")
+print(summary(m_emo))
+cat("\nSimple slopes for BAIT within each Condition (emotional/expressive):\n")
+print(emtrends(m_emo, ~ Condition, var = "BAIT_c"))
+print(contrast(emtrends(m_emo, ~ Condition, var = "BAIT_c"), "pairwise"))
+
+```
+
+```{r}
+#Visualise BAIT interaction
+
+library(ggeffects)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+
+# 1) Predictions across the observed BAIT range for each label
+pred_aes <- ggpredict(m_aes, terms = c("BAIT_c [all]", "Condition")) %>% 
+  as.data.frame()
+pred_emo <- ggpredict(m_emo, terms = c("BAIT_c [all]", "Condition")) %>% 
+  as.data.frame()
+
+# 2) A consistent palette (AI = blue, Human = red — adjust if you like)
 pal <- c("AI" = "#1f77b4", "Human" = "#d62728")
 
-p1 <- ggplot(pred_aes, aes(x = x, y = predicted, color = group, fill = group)) +
-  geom_line(size = 1.2) +
+# 3) Two ggplots that match your supervisor’s style (lines + ribbons)
+p_aes <- ggplot(pred_aes, aes(x = x, y = predicted, color = group, fill = group)) +
+  geom_line(linewidth = 1.2) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.15, color = NA) +
   scale_color_manual(values = pal, name = "Initial label") +
   scale_fill_manual(values = pal,  name = "Initial label") +
-  labs(x = "BAIT score (centered; higher = more negative)",
-       y = "Predicted aesthetic rating",
-       title = "Aesthetic ~ BAIT × Label") +
+  labs(
+    x = "BAIT score",
+    y = "Rating (0–6)",
+    title = "Aesthetic"
+  ) +
   theme_minimal(base_size = 13) +
-  theme(plot.title = element_text(face = "bold"))
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank()
+  )
 
-p2 <- ggplot(pred_emo, aes(x = x, y = predicted, color = group, fill = group)) +
-  geom_line(size = 1.2) +
+p_emo <- ggplot(pred_emo, aes(x = x, y = predicted, color = group, fill = group)) +
+  geom_line(linewidth = 1.2) +
   geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.15, color = NA) +
   scale_color_manual(values = pal, name = "Initial label") +
   scale_fill_manual(values = pal,  name = "Initial label") +
-  labs(x = "BAIT score (centered; higher = more negative)",
-       y = "Predicted emotional/expressive rating",
-       title = "Emotional/Expressive ~ BAIT × Label") +
+  labs(
+    x = "BAIT score",
+    y = "Rating (0–6)",
+    title = "Emotional/Expressive"
+  ) +
   theme_minimal(base_size = 13) +
-  theme(plot.title = element_text(face = "bold"))
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    axis.title.y = element_blank(),   # mirrors your supervisor’s side-by-side style
+    axis.text.y  = element_blank()
+  )
 
-p1 + p2
+# 4) Arrange like your supervisor (collect legend, add global title)
+fig_bait <- (p_aes | p_emo) +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "top",
+        legend.title   = element_text(face = "bold"))
 
+fig_bait <- fig_bait +
+  plot_annotation(
+    title = "AI Attitude Interaction",
+    theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
+  )
+
+# 5) Show and (optionally) save
+fig_bait
+# ggsave("figures/BAIT_interactions.png", fig_bait, width = 10, height = 4.5, dpi = 300)
 
 ```
 
@@ -966,8 +968,11 @@ contrast(emm, "revpairwise") %>% summary(infer = TRUE)
 
 ```{r}
 # ---- H3 interaction plot: Confidence by Condition × Media professionalism ----
-library(ggplot2)
 library(dplyr)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(ggplot2)
 
 # Turn EMMs into a tidy data frame
 emm_df <- as.data.frame(emm) %>%
@@ -977,7 +982,7 @@ emm_df <- as.data.frame(emm) %>%
   )
 
 # Colors (consistent with earlier figures)
-pro_cols <- c("No" = "#1f77b4", "Yes" = "#d62728")
+pro_cols <- c("No" = "#e377c2", "Yes" = "#2ca02c")
 
 p_h3 <- ggplot(emm_df,
                aes(x = Condition, y = emmean,
@@ -992,7 +997,7 @@ p_h3 <- ggplot(emm_df,
   scale_y_continuous(limits = c(0, 3), expand = expansion(mult = c(0.02, 0.06))) +
   labs(x = NULL,
        y = "Confidence (distance from midpoint; 0–3)",
-       title = "H3: Confidence by label (AI vs Human) and media professionalism (EMMs ±95% CI)") +
+       title = "Confidence in label (AI vs Human) and Media professionalism") +
   theme_bw(base_size = 13) +
   theme(legend.position = "top",
         strip.text = element_text(face = "bold"),
@@ -1119,7 +1124,7 @@ p_conf_violin <- ggplot(dat, aes(x = Condition, y = Confidence_label, fill = Con
   scale_color_manual(values = cond_cols) +
   scale_y_continuous(limits = c(0, 6), expand = expansion(mult = c(0.02, 0.06))) +
   labs(x = NULL, y = "Confidence rating (0–6)",
-       title = "Confidence by initial label (raw distribution + model EMM)") +
+       title = "Confidence by initial label") +
   theme_bw(base_size = 13) +
   theme(legend.position = "none",
         plot.title = element_text(face = "bold", hjust = 0.5))
@@ -1147,7 +1152,7 @@ p_match_jitter <- ggplot() +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1),
                      limits = c(0, 1), expand = expansion(mult = c(0.02, 0.06))) +
   labs(x = NULL, y = "Match to initial label (proportion)",
-       title = "Match by initial label (participant means + model probability)") +
+       title = "Match by initial label") +
   theme_bw(base_size = 13) +
   theme(legend.position = "none",
         plot.title = element_text(face = "bold", hjust = 0.5))
@@ -1157,7 +1162,7 @@ if (requireNamespace("patchwork", quietly = TRUE)) {
   library(patchwork)
   (p_conf_violin | p_match_jitter) +
     plot_annotation(
-      title = "H4(a): Distributions (left) and model-estimated effects (black) for confidence & match",
+      title = "Distributions for Confidence & Match",
       theme = theme(plot.title = element_text(face = "bold", size = 15, hjust = 0.5))
     )
 } else {
@@ -1217,166 +1222,97 @@ slope_diff
 
 ```
 
-#visual rep
-
-library(ggplot2)
-
-library(dplyr)
-
-\# Create prediction data from your fitted model
-
-pred_data \<- ggeffects::ggpredict(m_int_emo, terms = c("emo_c \[all\]", "Condition"))
-
-\# Plot
-
-ggplot(pred_data, aes(x = x, y = predicted, color = group)) +
-
-geom_line(size = 1.2) +
-
-geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group), alpha = 0.15, color = NA) +
-
-labs(
-
-x = "Emotionality Rating (centered)",
-
-y = "Predicted Task 2 Confidence Rating",
-
-color = "Initial Label",
-
-fill = "Initial Label",
-
-title = "Interaction Between Emotionality and Initial Label on Task 2 Confidence"
-
-) +
-
-scale_color_manual(values = c("#619CFF", "#F8766D")) +
-
-scale_fill_manual(values = c("#619CFF", "#F8766D")) +
-
-theme_minimal(base_size = 14)
-
 ```{r}
-# Visual: interaction between emotionality and initial label on confidence
-library(ggeffects)   # <-- needed for ggpredict
-library(ggplot2)
-library(dplyr)
-
-# Make sure the factor order matches your analysis (AI = reference)
-dat_int <- dat_int %>%
-  mutate(Condition = factor(Condition, levels = c("AI","Human")))
-
-# Predictions from the fitted interaction model
-pred_data <- ggeffects::ggpredict(m_int_emo, terms = c("emo_c [all]", "Condition"))
-# pred_data has columns: x, predicted, conf.low, conf.high, group
-
-ggplot(pred_data, aes(x = x, y = predicted, color = group)) +
-  geom_line(linewidth = 1.1) +
-  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group),
-              alpha = 0.18, color = NA) +
-  scale_color_manual(values = c("AI" = "#1f77b4", "Human" = "#d62728"), name = "Initial label") +
-  scale_fill_manual(values = c("AI" = "#1f77b4", "Human" = "#d62728"),  name = "Initial label") +
-  scale_y_continuous(limits = c(0, 6), expand = expansion(mult = c(0.02, 0.06))) +
-  labs(
-    x = "Emotional/Expressive (centered)",
-    y = "Predicted confidence (0–6)",
-    title = "H5(b): Emotional/expressive and Predicted Label"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(plot.title = element_text(face = "bold"))
-
-```
-
-```{r}
-# H5(b): Does Aesthetic × Condition predict Task-2 confidence?
+#Visual H5
 
 library(dplyr)
 library(lme4)
 library(lmerTest)
 library(emmeans)
+library(ggeffects)
 library(ggplot2)
+library(patchwork)
 
-# 0) Prep (AI as reference; center, not scale, to keep units interpretable)
+# --- 1) Prepare dataset ---
 dat_int <- dat %>%
   mutate(
-    aesthetic_c = scale(aesthetic, center = TRUE, scale = FALSE),
+    emo_c  = scale(emotional_expressive, center = TRUE, scale = FALSE),
+    aes_c  = scale(aesthetic, center = TRUE, scale = FALSE),
     Condition   = factor(Condition, levels = c("AI","Human")),
     Participant = factor(Participant),
     Stimulus    = factor(Stimulus)
   )
 
-# 1) Fit models (main-effects vs. interaction)
-m_main <- lmer(
-  Confidence_label ~ aesthetic_c + Condition + (1|Participant) + (1|Stimulus),
+# --- 2) Emotional/expressive models ---
+m_main_emo <- lmer(
+  Confidence_label ~ emo_c + Condition + (1 | Participant) + (1 | Stimulus),
+  data = dat_int, REML = FALSE
+)
+m_int_emo <- lmer(
+  Confidence_label ~ emo_c * Condition + (1 | Participant) + (1 | Stimulus),
   data = dat_int, REML = FALSE
 )
 
-m_int <- lmer(
-  Confidence_label ~ aesthetic_c * Condition + (1|Participant) + (1|Stimulus),
+anova(m_main_emo, m_int_emo)   # test if interaction improves fit
+summary(m_int_emo)
+
+# --- 3) Aesthetic models ---
+m_main_aes <- lmer(
+  Confidence_label ~ aes_c + Condition + (1 | Participant) + (1 | Stimulus),
+  data = dat_int, REML = FALSE
+)
+m_int_aes <- lmer(
+  Confidence_label ~ aes_c * Condition + (1 | Participant) + (1 | Stimulus),
   data = dat_int, REML = FALSE
 )
 
-# 2) Model comparison (does the interaction improve fit?)
-anova(m_main, m_int)
+anova(m_main_aes, m_int_aes)
+summary(m_int_aes)
 
-# 3) Summary with Satterthwaite df
-emmeans::emm_options(
-  pbkrtest.limit = nrow(dat_int),
-  lmerTest.limit = nrow(dat_int),
-  lmer.df        = "satterthwaite"
-)
-summary(m_int)
+# --- 4) Predictions for plotting ---
+pred_emo <- ggpredict(m_int_emo, terms = c("emo_c [all]", "Condition")) %>% as.data.frame()
+pred_aes <- ggpredict(m_int_aes, terms = c("aes_c [all]", "Condition")) %>% as.data.frame()
 
-# 4) Simple slopes (slope of aesthetic_c within each Condition)
-slopes <- emtrends(m_int, specs = "Condition", var = "aesthetic_c")
-slopes
-contrast(slopes, "pairwise") %>% summary(infer = TRUE)
+pal <- c("AI" = "#1f77b4", "Human" = "#d62728")
 
-# 5) Build prediction grid for plotting (EMMs across the range of aesthetic_c)
-a_range <- with(dat_int, seq(min(aesthetic_c, na.rm = TRUE),
-                             max(aesthetic_c, na.rm = TRUE), length.out = 100))
-
-pred_df <- emmeans(m_int, ~ aesthetic_c | Condition,
-                   at = list(aesthetic_c = a_range)) %>%
-  as.data.frame()
-
-# Be robust to emmeans column names
-# (typically: emmean, lower.CL, upper.CL; but we'll guard anyway)
-pick_col <- function(df, candidates) {
-  hits <- intersect(candidates, names(df))
-  if (!length(hits)) stop("Could not find any of: ", paste(candidates, collapse=", "))
-  hits[1]
-}
-y_col   <- pick_col(pred_df, c("emmean","response","prob","predicted"))
-lcl_col <- pick_col(pred_df, c("lower.CL","asymp.LCL","conf.low"))
-ucl_col <- pick_col(pred_df, c("upper.CL","asymp.UCL","conf.high"))
-
-plot_df <- pred_df %>%
-  mutate(Condition = factor(Condition, levels = c("AI","Human"))) %>%
-  transmute(
-    Condition,
-    aesthetic_c = aesthetic_c,
-    pred  = .data[[y_col]],
-    lower = .data[[lcl_col]],
-    upper = .data[[ucl_col]]
-  )
-
-# 6) Plot (same style/colors as earlier figures)
-cond_cols <- c("AI" = "#1f77b4", "Human" = "#d62728")
-
-p_aesthetic <- ggplot(plot_df, aes(x = aesthetic_c, y = pred, color = Condition, fill = Condition)) +
+p_emo <- ggplot(pred_emo, aes(x = x, y = predicted, color = group, fill = group)) +
   geom_line(linewidth = 1.1) +
-  geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.18, color = NA) +
-  scale_color_manual(values = cond_cols, name = "Initial label") +
-  scale_fill_manual(values = cond_cols,  name = "Initial label") +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.18, color = NA) +
+  scale_color_manual(values = pal, name = "Initial label:") +
+  scale_fill_manual(values = pal, name = "Initial label:") +
   scale_y_continuous(limits = c(0, 6), expand = expansion(mult = c(0.02, 0.06))) +
-  labs(
-    x = "Aesthetic rating (centered)",
-    y = "Predicted confidence (0–6)",
-    title = "Aesthetic Rating & Label Bias"
-  ) +
+  labs(x = "Emotional/Expressive",
+       y = "Predicted confidence (0–6)",
+       title = "") +
   theme_minimal(base_size = 14) +
   theme(plot.title = element_text(face = "bold"))
 
-p_aesthetic
+p_aes <- ggplot(pred_aes, aes(x = x, y = predicted, color = group, fill = group)) +
+  geom_line(linewidth = 1.1) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), alpha = 0.18, color = NA) +
+  scale_color_manual(values = pal, name = "Initial label:") +
+  scale_fill_manual(values = pal, name = "Initial label:") +
+  scale_y_continuous(limits = c(0, 6), expand = expansion(mult = c(0.02, 0.06))) +
+  labs(x = "Aesthetic Pleasure",
+       y = NULL,
+       title = "") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(face = "bold"),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+
+# --- 5) Combine plots ---
+fig_h5 <- (p_emo | p_aes) +
+  plot_layout(guides = "collect") &
+  theme(legend.position = "top")
+
+fig_h5 <- fig_h5 + plot_annotation(
+  title = "Confidence in Label Predicted by Emotionality/Expressivity & Aesthetic Pleasure",
+  theme = theme(plot.title = element_text(face = "bold", hjust = 0.5))
+)
+
+fig_h5
+# ggsave("figures/H5_interactions.png", fig_h5, width = 10, height = 4.5, dpi = 300)
+
 
 ```
